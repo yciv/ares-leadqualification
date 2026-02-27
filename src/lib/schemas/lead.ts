@@ -33,7 +33,7 @@ export type CruxOutput = z.infer<typeof CruxOutputSchema>;
 
 export const StandardizedOutputSchema = z.object({
   core_business_model: z.string(),
-  tech_maturity_score: z.number().min(1).max(5),
+  tech_maturity_score: z.number().describe("Integer from 1 to 5"),
   stack_archetype: z.enum([
     "modern_jamstack",
     "legacy_monolith",

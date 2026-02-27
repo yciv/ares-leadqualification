@@ -53,13 +53,20 @@ export async function getCruxData(
 
   const metrics = data?.record?.metrics ?? {};
 
+  const toNum = (v: unknown): number | null => {
+    if (v == null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+
   const extracted = {
-    crux_rank: data?.record?.collectionPeriod?.experimentalPopularity?.rank
+    crux_rank: toNum(
+      data?.record?.collectionPeriod?.experimentalPopularity?.rank
       ?? data?.record?.key?.experimentalPopularity?.rank
-      ?? null,
-    lcp: metrics.largest_contentful_paint?.percentiles?.p75 ?? null,
-    fid: metrics.first_input_delay?.percentiles?.p75 ?? null,
-    cls: metrics.cumulative_layout_shift?.percentiles?.p75 ?? null,
+    ),
+    lcp: toNum(metrics.largest_contentful_paint?.percentiles?.p75),
+    fid: toNum(metrics.first_input_delay?.percentiles?.p75),
+    cls: toNum(metrics.cumulative_layout_shift?.percentiles?.p75),
   };
 
   const result = CruxOutputSchema.safeParse(extracted);

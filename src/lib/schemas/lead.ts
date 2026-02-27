@@ -47,3 +47,7 @@ export const StandardizedOutputSchema = z.object({
 });
 
 export type StandardizedOutput = z.infer<typeof StandardizedOutputSchema>;
+
+export const EmbeddingSchema = z.array(z.number()).length(1536).nullable();
+
+export type Embedding = z.infer<typeof EmbeddingSchema>;

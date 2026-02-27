@@ -45,14 +45,30 @@ export async function enrichWithLinkup(
 
   const data = await response.json();
 
-  // Linkup returns structured output in the `answer` field as a JSON string
+  // Linkup may return structured output in different fields depending on API version
+  const rawAnswer = data.answer ?? data.results ?? data;
+
   let parsed: unknown;
   try {
-    parsed = typeof data.answer === "string" ? JSON.parse(data.answer) : data.answer;
+    parsed = typeof rawAnswer === "string" ? JSON.parse(rawAnswer) : rawAnswer;
   } catch {
     throw new Error(
-      `Failed to parse Linkup answer as JSON for ${canonicalDomain}: ${String(data.answer).slice(0, 500)}`
+      `Failed to parse Linkup answer as JSON for ${canonicalDomain}: ${JSON.stringify(data).slice(0, 500)}`
     );
+  }
+
+  // Truncate arrays that may exceed schema limits from external API
+  if (parsed && typeof parsed === "object") {
+    const p = parsed as Record<string, unknown>;
+    if (Array.isArray(p.active_job_postings)) {
+      p.active_job_postings = p.active_job_postings.slice(0, 10);
+    }
+    if (p.tech_stack && typeof p.tech_stack === "object") {
+      const ts = p.tech_stack as Record<string, unknown>;
+      if (Array.isArray(ts.raw)) {
+        ts.raw = ts.raw.slice(0, 15);
+      }
+    }
   }
 
   const result = LinkupOutputSchema.safeParse(parsed);

@@ -30,3 +30,20 @@ export const CruxOutputSchema = z.object({
 });
 
 export type CruxOutput = z.infer<typeof CruxOutputSchema>;
+
+export const StandardizedOutputSchema = z.object({
+  core_business_model: z.string(),
+  tech_maturity_score: z.number().min(1).max(5),
+  stack_archetype: z.enum([
+    "modern_jamstack",
+    "legacy_monolith",
+    "data_heavy",
+    "e-commerce_native",
+    "enterprise_suite",
+  ]),
+  traffic_velocity: z.string(),
+  workload_complexity: z.string(),
+  key_integration_flags: z.array(z.string()),
+});
+
+export type StandardizedOutput = z.infer<typeof StandardizedOutputSchema>;

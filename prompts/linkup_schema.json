@@ -1,0 +1,74 @@
+{
+  "type": "object",
+  "properties": {
+    "canonical_domain": {
+      "type": "string",
+      "description": "The root website domain of the company (e.g., 'vercel.com'). Strip all subdomains, http://, and www."
+    },
+    "company_name": {
+      "type": "string",
+      "description": "The official commercial name of the company."
+    },
+    "industry": {
+      "type": "string",
+      "enum": [
+        "SaaS",
+        "E-commerce",
+        "Agency",
+        "Healthcare",
+        "Finance",
+        "Manufacturing",
+        "Other"
+      ],
+      "description": "The core business model. You must select one from the enum list."
+    },
+    "headcount_band": {
+      "type": "string",
+      "enum": [
+        "1-10",
+        "11-50",
+        "51-200",
+        "201-1000",
+        "1000+"
+      ],
+      "description": "Estimated employee count band."
+    },
+    "active_job_postings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Up to 10 active engineering or GTM job titles. Prioritize roles signaling infrastructure investment or GTM expansion. Return empty array if no careers page found.",
+      "maxItems": 10
+    },
+    "primary_product": {
+      "type": "string",
+      "description": "75-100 word functional description covering: what the product does mechanically, the primary buyer pain it solves, and key integration surfaces or data touchpoints. Not a marketing tagline."
+    },
+    "tech_stack": {
+      "type": "object",
+      "properties": {
+        "raw": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Up to 15 specific named technologies detected from integrations page, job posting requirements, engineering blog, and site badges. Named tools only (e.g. 'Next.js', 'Snowflake', 'Salesforce'). No generic terms. If the product is built on or natively integrates with a core platform, include it here. Deduplicate: do not list the same provider under multiple names.",
+          "maxItems": 15
+        }
+      },
+      "required": ["raw"],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "canonical_domain",
+    "company_name",
+    "industry",
+    "headcount_band",
+    "active_job_postings",
+    "primary_product",
+    "tech_stack"
+  ],
+  "additionalProperties": false
+}

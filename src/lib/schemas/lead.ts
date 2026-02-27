@@ -21,3 +21,12 @@ export const LinkupOutputSchema = z.object({
 });
 
 export type LinkupOutput = z.infer<typeof LinkupOutputSchema>;
+
+export const CruxOutputSchema = z.object({
+  crux_rank: z.number().nullable(),
+  lcp: z.number().nullable(),
+  fid: z.number().nullable(),
+  cls: z.number().nullable(),
+});
+
+export type CruxOutput = z.infer<typeof CruxOutputSchema>;

@@ -51,3 +51,28 @@ export type StandardizedOutput = z.infer<typeof StandardizedOutputSchema>;
 export const EmbeddingSchema = z.array(z.number()).length(1536).nullable();
 
 export type Embedding = z.infer<typeof EmbeddingSchema>;
+
+export const ProjectTypeSchema = z.enum(["seed", "test", "live"]);
+
+export type ProjectType = z.infer<typeof ProjectTypeSchema>;
+
+export const LeadSchema = z.object({
+  id: z.string().uuid(),
+  company_name: z.string(),
+  canonical_domain: z.string(),
+  status: z.string(),
+  project_id: z.string().uuid().nullable(),
+  source_tag: z.string().nullable(),
+  fit_score: z.number().nullable(),
+  cluster_label: z.string().nullable(),
+  routing_flag: z.string().nullable(),
+  scored_at: z.string().datetime().nullable(),
+  linkup_data: LinkupOutputSchema.nullable(),
+  crux_data: CruxOutputSchema.nullable(),
+  standardized_data: StandardizedOutputSchema.nullable(),
+  embedding: EmbeddingSchema,
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+});
+
+export type Lead = z.infer<typeof LeadSchema>;

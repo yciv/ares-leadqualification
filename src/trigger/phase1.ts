@@ -9,6 +9,7 @@ const supabase = createClient(
 );
 
 interface Phase1Payload {
+  projectId: string;
   leads: Array<{
     id: string;
     companyName: string;
@@ -38,7 +39,8 @@ export const processPhase1Enrichment = task({
                 linkup_data: enriched,
                 status: "phase1_done",
               })
-              .eq("id", lead.id);
+              .eq("id", lead.id)
+              .eq("project_id", payload.projectId);
 
             if (error) {
               throw new Error(`Supabase update failed: ${error.message}`);
@@ -58,6 +60,7 @@ export const processPhase1Enrichment = task({
               .from("leads")
               .update({ status: "phase1_error" })
               .eq("id", lead.id)
+              .eq("project_id", payload.projectId)
               .then(({ error: updateErr }) => {
                 if (updateErr) {
                   logger.error(`Failed to set error status for lead`, {

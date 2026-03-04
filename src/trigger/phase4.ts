@@ -10,6 +10,7 @@ const supabase = createClient(
 );
 
 interface Phase4Payload {
+  projectId: string;
   leads: Array<{
     id: string;
     standardizedData: StandardizedOutput;
@@ -37,7 +38,8 @@ export const processPhase4Embeddings = task({
                 embedding,
                 status: "phase4_done",
               })
-              .eq("id", lead.id);
+              .eq("id", lead.id)
+              .eq("project_id", payload.projectId);
 
             if (error) {
               throw new Error(`Supabase update failed: ${error.message}`);
@@ -56,6 +58,7 @@ export const processPhase4Embeddings = task({
               .from("leads")
               .update({ status: "phase4_error" })
               .eq("id", lead.id)
+              .eq("project_id", payload.projectId)
               .then(({ error: updateErr }) => {
                 if (updateErr) {
                   logger.error("Failed to set error status for lead", {

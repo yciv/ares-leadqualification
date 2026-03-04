@@ -9,6 +9,7 @@ const supabase = createClient(
 );
 
 interface Phase2Payload {
+  projectId: string;
   leads: Array<{
     id: string;
     canonicalDomain: string;
@@ -34,7 +35,8 @@ export const processPhase2Crux = task({
                 crux_data: cruxData,
                 status: "phase2_done",
               })
-              .eq("id", lead.id);
+              .eq("id", lead.id)
+              .eq("project_id", payload.projectId);
 
             if (error) {
               throw new Error(`Supabase update failed: ${error.message}`);
@@ -57,6 +59,7 @@ export const processPhase2Crux = task({
               .from("leads")
               .update({ status: "phase2_error" })
               .eq("id", lead.id)
+              .eq("project_id", payload.projectId)
               .then(({ error: updateErr }) => {
                 if (updateErr) {
                   logger.error("Failed to set error status for lead", {

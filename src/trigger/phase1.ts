@@ -1,4 +1,4 @@
-import { task, logger } from "@trigger.dev/sdk/v3";
+import { task, logger, tasks } from "@trigger.dev/sdk/v3";
 import { createClient } from "@supabase/supabase-js";
 import pLimit from "p-limit";
 import { enrichWithLinkup } from "../lib/linkup/service";
@@ -23,6 +23,7 @@ export const processPhase1Enrichment = task({
     const limit = pLimit(5);
     let successful = 0;
     let failed = 0;
+    const successfulLeads: Array<{ id: string; canonicalDomain: string }> = [];
 
     await Promise.all(
       payload.leads.map((lead) =>
@@ -47,6 +48,7 @@ export const processPhase1Enrichment = task({
             }
 
             successful++;
+            successfulLeads.push({ id: lead.id, canonicalDomain: lead.canonicalDomain });
             logger.info(`Enriched lead`, { id: lead.id, domain: lead.canonicalDomain });
           } catch (err) {
             failed++;
@@ -73,6 +75,13 @@ export const processPhase1Enrichment = task({
         })
       )
     );
+
+    if (successfulLeads.length > 0) {
+      await tasks.trigger("process-phase2-crux", {
+        projectId: payload.projectId,
+        leads: successfulLeads,
+      });
+    }
 
     return { successful, failed };
   },

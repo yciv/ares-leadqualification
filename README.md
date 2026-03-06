@@ -84,7 +84,7 @@ Google Chrome UX Report API — p75 percentile metrics:
 404 = no data (not an error) — lead still progresses to `phase2_done` with all-null values.
 
 ### Phase 3: LLM Standardization
-**Service:** `src/lib/llm/service.ts` · **Task:** `src/trigger/phase3.ts` (concurrency: 5)
+**Service:** `src/lib/llm/service.ts` · **Task:** `src/trigger/phase3.ts` (concurrency: 3, 1500ms per-lead delay)
 
 Claude Haiku 4.5 normalizes Phase 1 + Phase 2 into a structured profile:
 
@@ -157,6 +157,7 @@ Scores a test project's leads against a seed project's centroids.
 ### Project Detail (`/projects/[id]`)
 - Live progress bar + stats row across all pipeline statuses
 - Supabase Realtime subscription on `leads` filtered by `project_id` — row updates propagate instantly
+- **Continue Pipeline** button — visible when any leads are stuck at `phase1_done`, `phase2_done`, or `phase3_done`; POSTs to `/api/projects/[id]/continue` which detects each group and triggers the correct next phase in one click
 - **Retry Failed** button — groups errored leads by phase, re-triggers the correct task per group
 - **Calculate Centroids** button — visible only for seed projects when all leads are `phase4_done`
 
@@ -284,7 +285,12 @@ OPENAI_API_KEY=<openai_api_key>
 # Client-side (browser Supabase client + Realtime)
 NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_key>
+
+# Trigger.dev worker authentication
+TRIGGER_SECRET_KEY=<tr_dev_... or tr_prod_...>
 ```
+
+`TRIGGER_SECRET_KEY` uses `tr_dev_` prefix for local dev, `tr_prod_` for production deployment. Set production keys in the Vercel and Trigger.dev dashboards — never in `.env.local`.
 
 ---
 
@@ -292,9 +298,13 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_key>
 
 ```bash
 npm install
-npm run dev        # Next.js dev server (http://localhost:3000)
+npm run dev              # Next.js dev server (http://localhost:3000)
+npm run dev:trigger      # Trigger.dev local worker (run alongside dev)
+npm run deploy:trigger   # Deploy worker to Trigger.dev cloud (prod key required)
 npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 ```
+
+> Both `npm run dev` and `npm run dev:trigger` must be running simultaneously for the pipeline to execute locally. The Trigger.dev CLI is `trigger.dev` (note the dot) — not `trigger`.
 
 ---
 
@@ -314,6 +324,7 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 │   │   │       ├── route.ts                   # POST /api/projects (create + trigger phase1)
 │   │   │       └── [id]/
 │   │   │           ├── retry/route.ts         # POST /api/projects/:id/retry
+│   │   │           ├── continue/route.ts      # POST /api/projects/:id/continue
 │   │   │           ├── centroids/route.ts     # POST /api/projects/:id/centroids
 │   │   │           └── score/route.ts         # POST /api/projects/:id/score
 │   │   ├── projects/
@@ -364,5 +375,33 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 |---|---|
 | CrUX returns CLS as string `"0.02"` | `toNum()` coercion helper |
 | Linkup returns >15 tech stack items | Arrays truncated before Zod validation |
+| Linkup returns non-standard `headcount_band` values (e.g. `"1000-5000"`) | `normalizeHeadcountBand()` coercion in `src/lib/linkup/service.ts` — maps first integer to correct bucket before Zod validation |
 | Anthropic API rejects `.min()`/`.max()` in JSON Schema | Use `.describe("Integer from 1 to 5")` instead |
+| Anthropic rate limit: 50 req/min hit during large Phase 3 batches | Phase 3 concurrency reduced to 3 + 1500ms per-lead delay (~40 req/min effective) |
+| Trigger.dev `trigger.config.ts` `maxDuration` is required in v4 | Set to `300` seconds (5 min ceiling for worst-case Phase 1 batches) |
+| Pipeline stops after Phase 1 if chaining not wired | Phases now auto-chain on success: 1→2→3→4. Use **Continue Pipeline** button to unstick leads at any intermediate `_done` status |
 | Supabase JS has no native bulk-update-with-different-values | Grouped by routing outcome for metadata; per-lead parallel updates for `fit_score` |
+
+---
+
+## Changelog
+
+### 2026-03-06 — Deployment Hardening + Pipeline Fixes
+
+**Deployment blockers resolved:**
+- Created `trigger.config.ts` with `project`, `runtime: "node"`, `logLevel`, `dirs`, `maxDuration: 300`
+- Added `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `TRIGGER_SECRET_KEY` to `.env.local`
+- Added `npm run dev:trigger` and `npm run deploy:trigger` scripts to `package.json` (CLI binary is `trigger.dev`, not `trigger`)
+- Created `.env.example` with all 9 variable names
+
+**Bug fixes:**
+- `src/lib/linkup/service.ts` — added `normalizeHeadcountBand()` to coerce Linkup's non-standard headcount values (e.g. `"1000-5000"`, `"101-200"`) to valid Zod enum values before validation
+- `src/trigger/phase3.ts` — reduced concurrency from 5 → 3, added 1500ms per-lead delay to stay under Anthropic's 50 req/min rate limit
+
+**Pipeline chaining:**
+- `phase1.ts` → `phase2.ts` → `phase3.ts` → `phase4.ts` now auto-chain on the happy path; each phase triggers the next with successful leads only
+- Phase 2→3 transition fetches `linkup_data` + `crux_data` from DB at batch-end (not available in phase 2 payload)
+
+**Continue Pipeline feature:**
+- `src/app/api/projects/[id]/continue/route.ts` — POST endpoint that queries leads by status (`phase1_done`, `phase2_done`, `phase3_done`) and triggers the correct next phase per group
+- `src/app/projects/[id]/page.tsx` — "Continue Pipeline (N)" button, visible when `stuckCount > 0`; shows per-phase push count on completion

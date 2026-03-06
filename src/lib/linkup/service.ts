@@ -2,6 +2,19 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { LinkupOutputSchema, type LinkupOutput } from "../schemas/lead";
 
+function normalizeHeadcountBand(raw: string): string {
+  const VALID_BANDS = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
+  if (VALID_BANDS.includes(raw)) return raw;
+  const match = raw.match(/\d+/);
+  if (!match) return raw;
+  const n = parseInt(match[0], 10);
+  if (n <= 10) return "1-10";
+  if (n <= 50) return "11-50";
+  if (n <= 200) return "51-200";
+  if (n <= 1000) return "201-1000";
+  return "1000+";
+}
+
 export async function enrichWithLinkup(
   companyName: string,
   canonicalDomain: string
@@ -68,6 +81,9 @@ export async function enrichWithLinkup(
       if (Array.isArray(ts.raw)) {
         ts.raw = ts.raw.slice(0, 15);
       }
+    }
+    if (typeof p.headcount_band === "string") {
+      p.headcount_band = normalizeHeadcountBand(p.headcount_band);
     }
   }
 

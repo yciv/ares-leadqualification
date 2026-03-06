@@ -92,6 +92,8 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [retrying, setRetrying] = useState(false);
   const [retryMessage, setRetryMessage] = useState<string | null>(null);
+  const [continuing, setContinuing] = useState(false);
+  const [continueMessage, setContinueMessage] = useState<string | null>(null);
   const [queuingCentroids, setQueuingCentroids] = useState(false);
   const [centroidsMessage, setCentroidsMessage] = useState<string | null>(null);
 
@@ -158,6 +160,26 @@ export default function ProjectDetailPage() {
     }
   }, [id]);
 
+  // ── Continue Pipeline handler ────────────────────────────────────────────────
+  const handleContinue = useCallback(async () => {
+    setContinuing(true);
+    setContinueMessage(null);
+    try {
+      const res = await fetch(`/api/projects/${id}/continue`, { method: "POST" });
+      const body = await res.json();
+      const { phase2, phase3, phase4 } = body.triggered ?? {};
+      const parts: string[] = [];
+      if (phase2) parts.push(`${phase2} lead${phase2 !== 1 ? "s" : ""} → Phase 2`);
+      if (phase3) parts.push(`${phase3} lead${phase3 !== 1 ? "s" : ""} → Phase 3`);
+      if (phase4) parts.push(`${phase4} lead${phase4 !== 1 ? "s" : ""} → Phase 4`);
+      setContinueMessage(parts.length > 0 ? `Pushed: ${parts.join(", ")}` : "No stuck leads found");
+    } catch {
+      setContinueMessage("Failed to continue pipeline");
+    } finally {
+      setContinuing(false);
+    }
+  }, [id]);
+
   // ── Calculate Centroids handler ─────────────────────────────────────────────
   const handleCalculateCentroids = useCallback(async () => {
     setQueuingCentroids(true);
@@ -191,6 +213,11 @@ export default function ProjectDetailPage() {
 
   const showCalculateCentroids =
     project?.project_type === "seed" && allPhase4Done;
+
+  const stuckCount = leads.filter((l) =>
+    ["phase1_done", "phase2_done", "phase3_done"].includes(l.status)
+  ).length;
+  const showContinuePipeline = stuckCount > 0;
 
   // ── Render ──────────────────────────────────────────────────────────────────
   if (loading) {
@@ -229,6 +256,15 @@ export default function ProjectDetailPage() {
 
         {/* Actions */}
         <div className="flex shrink-0 gap-2">
+          {showContinuePipeline && (
+            <button
+              onClick={handleContinue}
+              disabled={continuing}
+              className="rounded-lg border border-blue-700 bg-blue-950 px-4 py-2 text-sm font-medium text-blue-300 transition-colors hover:bg-blue-900 disabled:opacity-50"
+            >
+              {continuing ? "Continuing…" : `Continue Pipeline (${stuckCount})`}
+            </button>
+          )}
           {errorCount > 0 && (
             <button
               onClick={handleRetry}
@@ -249,6 +285,12 @@ export default function ProjectDetailPage() {
           )}
         </div>
       </div>
+
+      {continueMessage && (
+        <p className="rounded-lg border border-blue-800 bg-blue-950 px-4 py-2 text-sm text-blue-300">
+          {continueMessage}
+        </p>
+      )}
 
       {retryMessage && (
         <p className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-gray-300">

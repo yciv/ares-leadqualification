@@ -1,4 +1,4 @@
-import { task, logger } from "@trigger.dev/sdk/v3";
+import { task, logger, tasks } from "@trigger.dev/sdk/v3";
 import { createClient } from "@supabase/supabase-js";
 import pLimit from "p-limit";
 import { getCruxData } from "../lib/crux/service";
@@ -22,6 +22,7 @@ export const processPhase2Crux = task({
     const limit = pLimit(5);
     let successful = 0;
     let failed = 0;
+    const successfulIds: string[] = [];
 
     await Promise.all(
       payload.leads.map((lead) =>
@@ -43,6 +44,7 @@ export const processPhase2Crux = task({
             }
 
             successful++;
+            successfulIds.push(lead.id);
             logger.info("CrUX enriched lead", {
               id: lead.id,
               domain: lead.canonicalDomain,
@@ -72,6 +74,24 @@ export const processPhase2Crux = task({
         })
       )
     );
+
+    if (successfulIds.length > 0) {
+      const { data: leadsData } = await supabase
+        .from("leads")
+        .select("id, linkup_data, crux_data")
+        .in("id", successfulIds);
+
+      if (leadsData && leadsData.length > 0) {
+        await tasks.trigger("process-phase3-standardization", {
+          projectId: payload.projectId,
+          leads: leadsData.map((l) => ({
+            id: l.id,
+            linkupData: l.linkup_data,
+            cruxData: l.crux_data,
+          })),
+        });
+      }
+    }
 
     return { successful, failed };
   },

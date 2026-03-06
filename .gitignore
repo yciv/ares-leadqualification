@@ -6,3 +6,6 @@ node_modules/
 dist/
 .next/
 .claude/
+history.md
+claude.md
+.trigger/

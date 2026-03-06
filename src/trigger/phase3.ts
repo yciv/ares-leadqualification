@@ -1,4 +1,4 @@
-import { task, logger } from "@trigger.dev/sdk/v3";
+import { task, logger, tasks } from "@trigger.dev/sdk/v3";
 import { createClient } from "@supabase/supabase-js";
 import pLimit from "p-limit";
 import { standardizeProfile } from "../lib/llm/service";
@@ -20,9 +20,10 @@ interface Phase3Payload {
 export const processPhase3Standardization = task({
   id: "process-phase3-standardization",
   run: async (payload: Phase3Payload) => {
-    const limit = pLimit(5);
+    const limit = pLimit(3);
     let successful = 0;
     let failed = 0;
+    const successfulLeads: Array<{ id: string; standardizedData: any }> = [];
 
     await Promise.all(
       payload.leads.map((lead) =>
@@ -47,6 +48,7 @@ export const processPhase3Standardization = task({
             }
 
             successful++;
+            successfulLeads.push({ id: lead.id, standardizedData: standardized });
             logger.info("Standardized lead", { id: lead.id });
           } catch (err) {
             failed++;
@@ -69,9 +71,17 @@ export const processPhase3Standardization = task({
                 }
               });
           }
+          await new Promise((r) => setTimeout(r, 1500));
         })
       )
     );
+
+    if (successfulLeads.length > 0) {
+      await tasks.trigger("process-phase4-embeddings", {
+        projectId: payload.projectId,
+        leads: successfulLeads,
+      });
+    }
 
     return { successful, failed };
   },

@@ -40,7 +40,7 @@ export async function calculateCentroids(projectId: string): Promise<void> {
 
   // 3. Ask Claude to identify 2-4 ICP archetypes
   const { object } = await generateObject({
-    model: anthropic("claude-3-5-sonnet-latest"),
+    model: anthropic("claude-sonnet-4-5-20250929"),
     schema: ClusteringOutputSchema,
     prompt: `Given these ${profiles.length} company profiles, identify 2-4 distinct ICP archetypes based on their business model, tech stack, and complexity. Return a JSON object with a 'clusters' array.
 

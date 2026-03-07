@@ -8,7 +8,7 @@ Autonomous B2B lead enrichment, clustering, and scoring platform. Ingests raw co
 - **Database:** Supabase (Postgres + pgvector)
 - **Task Orchestration:** Trigger.dev v3
 - **LLM (standardization):** Claude Haiku 4.5 via Vercel AI SDK
-- **LLM (clustering):** Claude Sonnet 3.5 (`claude-3-5-sonnet-latest`) via Vercel AI SDK
+- **LLM (clustering):** Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`) via Vercel AI SDK
 - **Embeddings:** OpenAI `text-embedding-3-small` via Vercel AI SDK
 - **State Management:** Zustand
 - **Validation:** Zod
@@ -110,7 +110,7 @@ OpenAI `text-embedding-3-small` — produces 1536-dim vector stored via pgvector
 
 Triggered after all leads in a **seed** project reach `phase4_done`.
 
-1. Fetches all leads (`status = phase4_done`, `embedding IS NOT NULL`). Sends condensed profiles (`domain + standardized_data`) to **Claude Sonnet 3.5**.
+1. Fetches all leads (`status = phase4_done`, `embedding IS NOT NULL`). Sends condensed profiles (`domain + standardized_data`) to **Claude Sonnet 4.5**.
 2. Claude identifies **2–4 distinct ICP archetypes** and returns `{ cluster_label, description, canonical_domains[] }`.
 3. For each cluster, Postgres computes `avg(embedding)` server-side via the `get_centroid_for_domains` RPC — only the resulting 1536-dim vector travels over the wire.
 4. Centroid row upserted into `centroids` table (`UNIQUE(project_id, cluster_label)`).
@@ -405,3 +405,23 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 **Continue Pipeline feature:**
 - `src/app/api/projects/[id]/continue/route.ts` — POST endpoint that queries leads by status (`phase1_done`, `phase2_done`, `phase3_done`) and triggers the correct next phase per group
 - `src/app/projects/[id]/page.tsx` — "Continue Pipeline (N)" button, visible when `stuckCount > 0`; shows per-phase push count on completion
+
+---
+
+### 2026-03-07 — Scoring UI, Safety Guards & Realtime Results
+
+**Scoring trigger UI:**
+- `src/app/projects/[id]/page.tsx` — "Score Project" seed-ID input + button, visible for test/live projects when all leads are `phase4_done`; POSTs to `/api/projects/[id]/score` then navigates to results
+- `src/app/projects/[id]/page.tsx` — "View Results →" link, visible when any lead has a non-null `fit_score`
+
+**API safety guards:**
+- `src/app/api/projects/[id]/centroids/route.ts` — fetches project before queuing; returns 400 if `project_type !== "seed"`
+- `src/app/api/projects/[id]/score/route.ts` — validates test project is not a seed; validates seed project has at least one centroid before queuing
+
+**Scoring service — non-embedded lead handling:**
+- `src/lib/scoring/service.ts` — after scoring completes, queries `phase4_done` leads with null `fit_score` (no embedding, skipped by RPC) and bulk-sets `routing_flag = "unscored"`, `cluster_label = "No embedding"`
+
+**Realtime results page:**
+- `src/app/projects/[id]/results/page.tsx` — Supabase Realtime subscription on `leads` filtered by `project_id`; merges incoming updates into the store via `updateLead` without replacing all leads or re-running threshold logic
+- `src/lib/store/resultsStore.ts` — added `updateLead(leadId, updates)` action for partial, per-lead store updates
+- `src/components/results/TestResultsView.tsx` — animated "Scoring in progress" banner, visible while any `phase4_done` lead has a null `fit_score`; disappears automatically as Realtime updates arrive

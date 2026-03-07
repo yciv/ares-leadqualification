@@ -52,6 +52,7 @@ interface ResultsStore {
   reviewCount: number;
 
   setLeads: (leads: ResultLead[]) => void;
+  updateLead: (leadId: string, updates: Partial<ResultLead>) => void;
   setThreshold: (tier: keyof Thresholds, value: number) => void;
   overrideRouting: (leadId: string, newFlag: string) => void;
 }
@@ -63,6 +64,14 @@ export const useResultsStore = create<ResultsStore>((set, get) => ({
 
   setLeads(leads) {
     set({ leads });
+  },
+
+  updateLead(leadId, updates) {
+    set((state) => ({
+      leads: state.leads.map((lead) =>
+        lead.id === leadId ? { ...lead, ...updates } : lead
+      ),
+    }));
   },
 
   setThreshold(tier, value) {

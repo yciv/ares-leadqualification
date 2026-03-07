@@ -165,9 +165,20 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
   const reviewCount = useResultsStore((s) => s.reviewCount);
 
   const canSyncToAttio = reviewCount >= 10;
+  const pendingCount = leads.filter((l) => l.fit_score == null && l.status === "phase4_done").length;
 
   return (
     <div className="space-y-6">
+      {/* ── Scoring-in-progress banner ── */}
+      {pendingCount > 0 && (
+        <div className="flex items-center gap-3 rounded-xl border border-violet-800/50 bg-violet-950/30 px-5 py-3">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-violet-400" />
+          <p className="text-sm text-violet-300">
+            Scoring in progress — {pendingCount} lead{pendingCount !== 1 ? "s" : ""} pending...
+          </p>
+        </div>
+      )}
+
       {/* ── Threshold controls ── */}
       <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
         <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-400">

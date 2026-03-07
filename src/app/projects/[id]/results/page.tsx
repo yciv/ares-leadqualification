@@ -30,6 +30,7 @@ export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
   const supabase = createBrowserClient();
   const setLeads = useResultsStore((s) => s.setLeads);
+  const updateLead = useResultsStore((s) => s.updateLead);
 
   const [project, setProject] = useState<Project | null>(null);
   const [centroids, setCentroids] = useState<Centroid[]>([]);
@@ -60,6 +61,26 @@ export default function ResultsPage() {
     }
 
     load();
+
+    const channel = supabase
+      .channel("scoring-results")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "leads",
+          filter: `project_id=eq.${id}`,
+        },
+        (payload) => {
+          updateLead(payload.new.id as string, payload.new as Partial<ResultLead>);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {

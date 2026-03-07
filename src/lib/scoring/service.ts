@@ -152,7 +152,26 @@ export async function scoreLeadsAgainstCentroids(
 
   await Promise.all(updatePromises);
 
-  // Step 6: Record the scoring run
+  // Step 6: Mark leads that had no embedding (skipped by RPC) as unscored
+  const { data: unscoredLeads } = await supabase
+    .from("leads")
+    .select("id")
+    .eq("project_id", testProjectId)
+    .eq("status", "phase4_done")
+    .is("fit_score", null);
+
+  if (unscoredLeads && unscoredLeads.length > 0) {
+    await supabase
+      .from("leads")
+      .update({ routing_flag: "unscored", cluster_label: "No embedding" })
+      .eq("project_id", testProjectId)
+      .eq("status", "phase4_done")
+      .is("fit_score", null);
+
+    console.log(`[Scoring] ${unscoredLeads.length} leads marked unscored (no embedding)`);
+  }
+
+  // Step 7: Record the scoring run
   const { error: runError } = await supabase.from("scoring_runs").insert({
     seed_project_id: seedProjectId,
     test_project_id: testProjectId,

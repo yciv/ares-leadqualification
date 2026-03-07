@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -85,6 +85,7 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const supabase = createBrowserClient();
 
   const [project, setProject] = useState<Project | null>(null);
@@ -96,6 +97,8 @@ export default function ProjectDetailPage() {
   const [continueMessage, setContinueMessage] = useState<string | null>(null);
   const [queuingCentroids, setQueuingCentroids] = useState(false);
   const [centroidsMessage, setCentroidsMessage] = useState<string | null>(null);
+  const [seedProjectId, setSeedProjectId] = useState("");
+  const [scoring, setScoring] = useState(false);
 
   // ── Initial data fetch ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -180,6 +183,28 @@ export default function ProjectDetailPage() {
     }
   }, [id]);
 
+  // ── Score Project handler ────────────────────────────────────────────────────
+  const handleScore = useCallback(async () => {
+    setScoring(true);
+    try {
+      const res = await fetch(`/api/projects/${id}/score`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seedProjectId }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        alert(body.error ?? `Error ${res.status}`);
+        return;
+      }
+      router.push(`/projects/${id}/results`);
+    } catch {
+      alert("Failed to trigger scoring");
+    } finally {
+      setScoring(false);
+    }
+  }, [id, seedProjectId, router]);
+
   // ── Calculate Centroids handler ─────────────────────────────────────────────
   const handleCalculateCentroids = useCallback(async () => {
     setQueuingCentroids(true);
@@ -213,6 +238,9 @@ export default function ProjectDetailPage() {
 
   const showCalculateCentroids =
     project?.project_type === "seed" && allPhase4Done;
+
+  const showScoreProject =
+    (project?.project_type === "test" || project?.project_type === "live") && allPhase4Done;
 
   const stuckCount = leads.filter((l) =>
     ["phase1_done", "phase2_done", "phase3_done"].includes(l.status)
@@ -282,6 +310,32 @@ export default function ProjectDetailPage() {
             >
               {queuingCentroids ? "Queueing…" : "Calculate Centroids"}
             </button>
+          )}
+          {showScoreProject && (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Seed Project ID"
+                value={seedProjectId}
+                onChange={(e) => setSeedProjectId(e.target.value)}
+                className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-500"
+              />
+              <button
+                onClick={handleScore}
+                disabled={scoring || !seedProjectId.trim()}
+                className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+              >
+                {scoring ? "Scoring…" : "Score Project"}
+              </button>
+            </div>
+          )}
+          {leads.some((l) => l.fit_score !== null) && (
+            <a
+              href={`/projects/${id}/results`}
+              className="rounded-md bg-zinc-700 px-4 py-1.5 text-sm font-medium text-zinc-100 hover:bg-zinc-600"
+            >
+              View Results →
+            </a>
           )}
         </div>
       </div>

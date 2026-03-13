@@ -1,4 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
+import {
+  extractNumericFeatures,
+  computeNumericSimilarity,
+  computeCompleteness,
+  type NumericFeatures,
+} from "./numeric";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -7,14 +13,14 @@ const supabase = createClient(
 
 // ─── Routing thresholds ───────────────────────────────────────────────────────
 
-function resolveRouting(similarity: number, clusterLabel: string): {
-  cluster_label: string;
-  routing_flag: string;
-} {
-  if (similarity >= 0.85) return { cluster_label: clusterLabel, routing_flag: "AE" };
-  if (similarity >= 0.72) return { cluster_label: clusterLabel, routing_flag: "SDR" };
-  if (similarity >= 0.60) return { cluster_label: "fringe",    routing_flag: "nurture" };
-  return                         { cluster_label: "no_match",  routing_flag: "reject" };
+function resolveRouting(
+  finalScore: number,
+  clusterLabel: string
+): { cluster_label: string; routing_flag: string } {
+  if (finalScore >= 0.55) return { cluster_label: clusterLabel, routing_flag: "AE" };
+  if (finalScore >= 0.35) return { cluster_label: clusterLabel, routing_flag: "SDR" };
+  if (finalScore >= 0.20) return { cluster_label: "fringe",     routing_flag: "nurture" };
+  return                         { cluster_label: "no_match",   routing_flag: "reject" };
 }
 
 // ─── Main function ────────────────────────────────────────────────────────────
@@ -23,10 +29,10 @@ export async function scoreLeadsAgainstCentroids(
   testProjectId: string,
   seedProjectId: string
 ): Promise<void> {
-  // Step 1: Fetch centroids for the seed project
+  // Step 1: Fetch centroids for the seed project (include numeric_features)
   const { data: centroids, error: centroidsError } = await supabase
     .from("centroids")
-    .select("id, cluster_label, centroid_vector")
+    .select("id, cluster_label, centroid_vector, numeric_features")
     .eq("project_id", seedProjectId);
 
   if (centroidsError) {
@@ -36,9 +42,36 @@ export async function scoreLeadsAgainstCentroids(
     throw new Error(`No centroids found for seed project ${seedProjectId}`);
   }
 
-  // Step 2: Score the test project leads against every centroid
-  // best[leadId] = { similarity, cluster_label }
-  const best = new Map<string, { similarity: number; cluster_label: string }>();
+  // Step 2: Fetch test leads data for numeric feature extraction
+  const { data: testLeads, error: testLeadsError } = await supabase
+    .from("leads")
+    .select("id, crux_data, standardized_data")
+    .eq("project_id", testProjectId)
+    .eq("status", "phase4_done");
+
+  if (testLeadsError) {
+    throw new Error(`Failed to fetch test leads: ${testLeadsError.message}`);
+  }
+
+  const leadDataMap = new Map(
+    (testLeads ?? []).map((l) => [
+      l.id as string,
+      {
+        crux_data: l.crux_data,
+        standardized_data: l.standardized_data,
+      },
+    ])
+  );
+
+  // Step 3: Score against every centroid; track best composite score per lead
+  type BestEntry = {
+    text_similarity: number;
+    numeric_similarity: number | null;
+    completeness_score: number;
+    fit_score: number;
+    cluster_label: string;
+  };
+  const best = new Map<string, BestEntry>();
 
   for (const centroid of centroids) {
     const { data: rows, error: rpcError } = await supabase.rpc(
@@ -56,12 +89,35 @@ export async function scoreLeadsAgainstCentroids(
       );
     }
 
-    // Step 3: Keep the highest-similarity centroid per lead
+    const centroidNumeric = centroid.numeric_features as NumericFeatures | null;
+
     for (const row of rows as Array<{ lead_id: string; similarity: number }>) {
+      const leadData = leadDataMap.get(row.lead_id);
+
+      let numericSim: number | null = null;
+      let completeness = 0;
+
+      if (leadData) {
+        const leadFeatures = extractNumericFeatures(leadData);
+        completeness = computeCompleteness(leadFeatures);
+        if (centroidNumeric) {
+          numericSim = computeNumericSimilarity(leadFeatures, centroidNumeric);
+        }
+      }
+
+      // Composite: 70% text + 30% numeric; fall back to 100% text if no numeric overlap
+      const fitScore =
+        numericSim !== null
+          ? 0.7 * row.similarity + 0.3 * numericSim
+          : row.similarity;
+
       const current = best.get(row.lead_id);
-      if (!current || row.similarity > current.similarity) {
+      if (!current || fitScore > current.fit_score) {
         best.set(row.lead_id, {
-          similarity: row.similarity,
+          text_similarity: row.similarity,
+          numeric_similarity: numericSim,
+          completeness_score: completeness,
+          fit_score: fitScore,
           cluster_label: centroid.cluster_label as string,
         });
       }
@@ -70,45 +126,33 @@ export async function scoreLeadsAgainstCentroids(
 
   if (best.size === 0) return;
 
-  // Step 4 + 5: Apply routing logic and group by (routing_flag, cluster_label)
-  // so we can do one update per unique combination instead of N individual updates.
+  // Step 4: Group leads by routing outcome for bulk cluster/flag updates
   const scoredAt = new Date().toISOString();
 
   type UpdateGroup = {
     routing_flag: string;
     cluster_label: string;
-    fit_score: number;
     ids: string[];
   };
-
-  // We need per-row fit_score, so group only by routing outcome (same flag+label)
-  // and then do a per-lead update for the fit_score. To avoid N round-trips we
-  // batch leads that share the same routing_flag + cluster_label AND same rounded
-  // fit_score bucket — but since fit_score is continuous we just do individual
-  // updates efficiently via Promise.all (not sequential).
   const updateGroups = new Map<string, UpdateGroup>();
 
-  for (const [leadId, { similarity, cluster_label }] of best) {
-    const routing = resolveRouting(similarity, cluster_label);
+  for (const [leadId, entry] of best) {
+    const routing = resolveRouting(entry.fit_score, entry.cluster_label);
     const key = `${routing.routing_flag}::${routing.cluster_label}`;
 
     if (!updateGroups.has(key)) {
       updateGroups.set(key, {
         routing_flag: routing.routing_flag,
         cluster_label: routing.cluster_label,
-        fit_score: similarity, // placeholder; overridden per-lead below
         ids: [],
       });
     }
     updateGroups.get(key)!.ids.push(leadId);
   }
 
-  // Bulk update: one Supabase call per (routing_flag, cluster_label) group.
-  // fit_score varies per lead so we still need per-lead updates for that field;
-  // we run them in parallel to keep latency low.
   const updatePromises: Promise<void>[] = [];
 
-  // Group-level update for routing_flag + cluster_label (same for all in group)
+  // Bulk update: routing_flag + cluster_label + scored_at (same per group)
   for (const group of updateGroups.values()) {
     updatePromises.push(
       (async () => {
@@ -131,19 +175,24 @@ export async function scoreLeadsAgainstCentroids(
     );
   }
 
-  // Per-lead update for fit_score (continuous float — cannot batch without CASE)
-  for (const [leadId, { similarity }] of best) {
+  // Per-lead update: all score fields (continuous — cannot batch without CASE)
+  for (const [leadId, entry] of best) {
     updatePromises.push(
       (async () => {
         const { error } = await supabase
           .from("leads")
-          .update({ fit_score: similarity })
+          .update({
+            fit_score: entry.fit_score,
+            text_similarity: entry.text_similarity,
+            numeric_similarity: entry.numeric_similarity,
+            completeness_score: entry.completeness_score,
+          })
           .eq("id", leadId)
           .eq("project_id", testProjectId);
 
         if (error) {
           throw new Error(
-            `fit_score update failed for lead ${leadId}: ${error.message}`
+            `Score fields update failed for lead ${leadId}: ${error.message}`
           );
         }
       })()
@@ -152,7 +201,7 @@ export async function scoreLeadsAgainstCentroids(
 
   await Promise.all(updatePromises);
 
-  // Step 6: Mark leads that had no embedding (skipped by RPC) as unscored
+  // Step 5: Mark leads with no embedding as unscored
   const { data: unscoredLeads } = await supabase
     .from("leads")
     .select("id")
@@ -171,7 +220,7 @@ export async function scoreLeadsAgainstCentroids(
     console.log(`[Scoring] ${unscoredLeads.length} leads marked unscored (no embedding)`);
   }
 
-  // Step 7: Record the scoring run
+  // Step 6: Record the scoring run
   const { error: runError } = await supabase.from("scoring_runs").insert({
     seed_project_id: seedProjectId,
     test_project_id: testProjectId,

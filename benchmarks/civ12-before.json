@@ -1,0 +1,721 @@
+{
+  "captured_at": "2026-03-13T23:43:28.989Z",
+  "seed_project_id": "e60da4b1-acd1-4712-ac2c-4bfb55d1c76a",
+  "test_project_id": "a73a4567-22f0-4dae-98db-9df8711c4cd4",
+  "seed_leads": [
+    {
+      "canonical_domain": "ablenetinc.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "aflglobal.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "aldar.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "ascap.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "bamboohealth.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "baptisthealth.net",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "batterseapowerstation.co.uk",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "brandid.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "buddgroup.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "buyersedgeplatform.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "bymycar.fr",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cancercenter.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cars.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "charliehealth.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "chefman.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cigna.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "clearbridge.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "colonyridge.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "concertors.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "constructionline.co.uk",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "corp.thinkhr.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "corporate.exxonmobil.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cvent.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "databaseusa.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "datadobi.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "doctorlogic.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "doordash.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "ef.edu",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "elapservices.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "employmentlawgroup.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "emsar.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "etereman.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "exeterfinance.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "flatiron.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "fossnational.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "fundingoptions.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "gusto.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "har.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "hds.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "hipagesgroup.com.au",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "ig.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "imprivata.co.uk",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "internetbrands.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "intrafi.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "jaguarlandrover.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "jfrog.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "jmcacademy.edu.au",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "kenshoo.co.uk",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "komatsu.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "lapu.edu",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "lca-networks.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "libertymutual.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "lincolninternational.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "marmofinancial.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mathworks.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mdta.maryland.gov",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mitratech.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "moleculardevices.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mongodb.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "nn.nl",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "northpropertygroup.co.uk",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "novartis.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "onfido.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "opploans.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "Ornikar.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "paycor.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "peachyinsurance.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "pepperstone.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "phreesia.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "powerfleet.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rapid7.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rbauction.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rebelathletic.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rocketquote.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rsli.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "sageintacct.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "salesforce.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "salsify.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "sapagroup.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "segrocers.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "skillsoft.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "smartleasing.com.au",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "smithsinterconnect.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "sonder.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "south.edu",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "splunk.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "spragueenergy.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "standardbank.co.za",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "talktalkbusiness.co.uk",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "tasanet.org",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "taylorcommunications.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "thomsonreuters.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "timescale.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "vandaliarental.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "verivox.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "westlandinsurance.ca",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "wgu.edu",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "wm.com",
+      "cluster_label": null,
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "zacksim.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": null
+    }
+  ],
+  "test_leads": [
+    {
+      "id": "3099b0a7-9a91-40a5-b526-c5a112ef1144",
+      "canonical_domain": "42u.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": 0.652071801884151,
+      "routing_flag": "AE",
+      "text_similarity": 0.551661015678658,
+      "numeric_similarity": 0.886363636363636
+    },
+    {
+      "id": "a6ff0590-516e-4666-9f24-3a2e2bbc53e2",
+      "canonical_domain": "aclautomotive.co.uk",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.659086810149641,
+      "routing_flag": "AE",
+      "text_similarity": 0.636654966880439,
+      "numeric_similarity": 0.711427777777778
+    },
+    {
+      "id": "2d5cfbd8-f981-4395-887b-6776327d672f",
+      "canonical_domain": "assentcompliance.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": 0.698475425228725,
+      "routing_flag": "AE",
+      "text_similarity": 0.583536321755321,
+      "numeric_similarity": 0.966666666666667
+    },
+    {
+      "id": "0cd82e1e-2010-4e0a-ba9d-5db11a0e3db6",
+      "canonical_domain": "benchmarkinc.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.69837058880701,
+      "routing_flag": "AE",
+      "text_similarity": 0.595886555438586,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "40116844-3585-4053-8aeb-117bd46452c8",
+      "canonical_domain": "centurycommunities.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.631181046873509,
+      "routing_flag": "AE",
+      "text_similarity": 0.553472924105013,
+      "numeric_similarity": 0.8125
+    },
+    {
+      "id": "ee70740f-7932-4149-8a7c-c153f5ff6035",
+      "canonical_domain": "crbcunninghams.co.uk",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.647721126431747,
+      "routing_flag": "AE",
+      "text_similarity": 0.57710160918821,
+      "numeric_similarity": 0.8125
+    },
+    {
+      "id": "234e1960-76cc-4cc3-bbda-714d2655f52d",
+      "canonical_domain": "equativ.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": 0.712286677181686,
+      "routing_flag": "AE",
+      "text_similarity": 0.619593212300368,
+      "numeric_similarity": 0.928571428571429
+    },
+    {
+      "id": "32bf0b7e-bafd-4b75-bc80-4ea0208acf3c",
+      "canonical_domain": "gofocusforward.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.716994750560265,
+      "routing_flag": "AE",
+      "text_similarity": 0.622492500800379,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "b2a6dc4e-6857-4f76-bb0c-2bf0e7a79e96",
+      "canonical_domain": "goldco.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.617628704330254,
+      "routing_flag": "AE",
+      "text_similarity": 0.468081482376553,
+      "numeric_similarity": 0.966572222222222
+    },
+    {
+      "id": "3267bf91-1fec-4d66-a7ef-b0935c939922",
+      "canonical_domain": "iristelehealth.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": 0.706782155593771,
+      "routing_flag": "AE",
+      "text_similarity": 0.592550698467292,
+      "numeric_similarity": 0.973322222222222
+    },
+    {
+      "id": "45aa2e35-77a0-404e-89f4-ad8b9050607a",
+      "canonical_domain": "lex-drive.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.706606464933229,
+      "routing_flag": "AE",
+      "text_similarity": 0.607652092761756,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "d259a1df-99be-44eb-80f8-3f9e5baa282e",
+      "canonical_domain": "lncurtis.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.640016464520751,
+      "routing_flag": "AE",
+      "text_similarity": 0.50694971122012,
+      "numeric_similarity": 0.950505555555556
+    },
+    {
+      "id": "c80bc316-bed7-4897-ab1e-69bd01572be7",
+      "canonical_domain": "loftware.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": 0.677125862375547,
+      "routing_flag": "AE",
+      "text_similarity": 0.553036946250781,
+      "numeric_similarity": 0.966666666666667
+    },
+    {
+      "id": "31b047db-d0ef-4cc9-86a5-1681240a75c5",
+      "canonical_domain": "msite.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": 0.72139040280841,
+      "routing_flag": "AE",
+      "text_similarity": 0.616272004012015,
+      "numeric_similarity": 0.966666666666667
+    },
+    {
+      "id": "eb5e2ea6-431e-4d22-9255-8ac1ca1096cf",
+      "canonical_domain": "neurologica.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": 0.671916175423224,
+      "routing_flag": "AE",
+      "text_similarity": 0.545594536318891,
+      "numeric_similarity": 0.966666666666667
+    },
+    {
+      "id": "0b7fd361-9a77-4d60-a458-e0d4636df914",
+      "canonical_domain": "newspringcapital.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.718047237694586,
+      "routing_flag": "AE",
+      "text_similarity": 0.61879843480179,
+      "numeric_similarity": 0.949627777777778
+    },
+    {
+      "id": "755ffd33-b397-4f86-8b69-d080f292d0d6",
+      "canonical_domain": "omnissa.com",
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "fit_score": 0.721712174855899,
+      "routing_flag": "AE",
+      "text_similarity": 0.660887522521415,
+      "numeric_similarity": 0.863636363636364
+    },
+    {
+      "id": "c39a6253-2f6f-48d2-9a12-cbb5d0bccbc7",
+      "canonical_domain": "sage.com",
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "fit_score": 0.795438475546055,
+      "routing_flag": "AE",
+      "text_similarity": 0.722054965065793,
+      "numeric_similarity": 0.966666666666667
+    },
+    {
+      "id": "4d0c61a6-5ea1-4ccc-9ecd-25db919cb3a0",
+      "canonical_domain": "sfgroup.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.701528383882122,
+      "routing_flag": "AE",
+      "text_similarity": 0.600397691260175,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "7449b281-3da7-4f51-a36c-a15607036b7d",
+      "canonical_domain": "splitero.com",
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "fit_score": 0.673231130374253,
+      "routing_flag": "AE",
+      "text_similarity": 0.609717941350973,
+      "numeric_similarity": 0.821428571428571
+    },
+    {
+      "id": "2bccb7af-bc78-4f99-8eed-64492aef2f7a",
+      "canonical_domain": "svcleanenergy.org",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.603613027425587,
+      "routing_flag": "AE",
+      "text_similarity": 0.493630515369886,
+      "numeric_similarity": 0.860238888888889
+    },
+    {
+      "id": "829a29f0-36e7-4fe2-ac2a-cdf92287e641",
+      "canonical_domain": "treancorp.com",
+      "cluster_label": "Legacy & Operational Services",
+      "fit_score": 0.694998772747855,
+      "routing_flag": "AE",
+      "text_similarity": 0.591069675354078,
+      "numeric_similarity": 0.9375
+    }
+  ],
+  "centroids": [
+    {
+      "cluster_label": "Digital Marketplaces & E-Commerce",
+      "lead_count": 14
+    },
+    {
+      "cluster_label": "Enterprise Platform & Infrastructure",
+      "lead_count": 22
+    },
+    {
+      "cluster_label": "Legacy & Operational Services",
+      "lead_count": 20
+    },
+    {
+      "cluster_label": "Vertical SaaS & Workflow Automation",
+      "lead_count": 15
+    }
+  ],
+  "clustering_metadata": null
+}

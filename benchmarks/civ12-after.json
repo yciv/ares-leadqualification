@@ -1,0 +1,725 @@
+{
+  "captured_at": "2026-03-13T23:54:13.647Z",
+  "seed_project_id": "e60da4b1-acd1-4712-ac2c-4bfb55d1c76a",
+  "test_project_id": "a73a4567-22f0-4dae-98db-9df8711c4cd4",
+  "seed_leads": [
+    {
+      "canonical_domain": "ablenetinc.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "aflglobal.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "aldar.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "ascap.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "bamboohealth.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "baptisthealth.net",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "batterseapowerstation.co.uk",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "brandid.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "buddgroup.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "buyersedgeplatform.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "bymycar.fr",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cancercenter.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cars.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "charliehealth.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "chefman.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cigna.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "clearbridge.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "colonyridge.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "concertors.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "constructionline.co.uk",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "corp.thinkhr.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "corporate.exxonmobil.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "cvent.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "databaseusa.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "datadobi.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "doctorlogic.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "doordash.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "ef.edu",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "elapservices.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "employmentlawgroup.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "emsar.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "etereman.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "exeterfinance.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "flatiron.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "fossnational.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "fundingoptions.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "gusto.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "har.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "hds.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "hipagesgroup.com.au",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "ig.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "imprivata.co.uk",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "internetbrands.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "intrafi.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "jaguarlandrover.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "jfrog.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "jmcacademy.edu.au",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "kenshoo.co.uk",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "komatsu.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "lapu.edu",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "lca-networks.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "libertymutual.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "lincolninternational.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "marmofinancial.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mathworks.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mdta.maryland.gov",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mitratech.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "moleculardevices.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "mongodb.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "nn.nl",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "northpropertygroup.co.uk",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "novartis.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "onfido.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "opploans.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "Ornikar.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "paycor.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "peachyinsurance.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "pepperstone.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "phreesia.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "powerfleet.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rapid7.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rbauction.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rebelathletic.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rocketquote.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "rsli.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "sageintacct.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "salesforce.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "salsify.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "sapagroup.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "segrocers.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "skillsoft.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "smartleasing.com.au",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "smithsinterconnect.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "sonder.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "south.edu",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "splunk.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "spragueenergy.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "standardbank.co.za",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "talktalkbusiness.co.uk",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "tasanet.org",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "taylorcommunications.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "thomsonreuters.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "timescale.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "vandaliarental.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "verivox.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "westlandinsurance.ca",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "wgu.edu",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "wm.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": null
+    },
+    {
+      "canonical_domain": "zacksim.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": null
+    }
+  ],
+  "test_leads": [
+    {
+      "id": "3099b0a7-9a91-40a5-b526-c5a112ef1144",
+      "canonical_domain": "42u.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": 0.655892014466769,
+      "routing_flag": "AE",
+      "text_similarity": 0.546988592095384,
+      "numeric_similarity": 0.91
+    },
+    {
+      "id": "a6ff0590-516e-4666-9f24-3a2e2bbc53e2",
+      "canonical_domain": "aclautomotive.co.uk",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": 0.628872044639814,
+      "routing_flag": "AE",
+      "text_similarity": 0.63971344722981,
+      "numeric_similarity": 0.603575438596491
+    },
+    {
+      "id": "2d5cfbd8-f981-4395-887b-6776327d672f",
+      "canonical_domain": "assentcompliance.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": 0.697651587651212,
+      "routing_flag": "AE",
+      "text_similarity": 0.606645125216017,
+      "numeric_similarity": 0.91
+    },
+    {
+      "id": "0cd82e1e-2010-4e0a-ba9d-5db11a0e3db6",
+      "canonical_domain": "benchmarkinc.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.705849773729604,
+      "routing_flag": "AE",
+      "text_similarity": 0.606571105328006,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "40116844-3585-4053-8aeb-117bd46452c8",
+      "canonical_domain": "centurycommunities.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": 0.667400549503466,
+      "routing_flag": "AE",
+      "text_similarity": 0.541775221095177,
+      "numeric_similarity": 0.960526315789474
+    },
+    {
+      "id": "ee70740f-7932-4149-8a7c-c153f5ff6035",
+      "canonical_domain": "crbcunninghams.co.uk",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": 0.694784036578645,
+      "routing_flag": "AE",
+      "text_similarity": 0.580894488345433,
+      "numeric_similarity": 0.960526315789474
+    },
+    {
+      "id": "234e1960-76cc-4cc3-bbda-714d2655f52d",
+      "canonical_domain": "equativ.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": 0.679217523211018,
+      "routing_flag": "AE",
+      "text_similarity": 0.631964882782657,
+      "numeric_similarity": 0.789473684210526
+    },
+    {
+      "id": "32bf0b7e-bafd-4b75-bc80-4ea0208acf3c",
+      "canonical_domain": "gofocusforward.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.684891789501949,
+      "routing_flag": "AE",
+      "text_similarity": 0.576631127859927,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "b2a6dc4e-6857-4f76-bb0c-2bf0e7a79e96",
+      "canonical_domain": "goldco.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.631771312045805,
+      "routing_flag": "AE",
+      "text_similarity": 0.487594731494008,
+      "numeric_similarity": 0.968183333333333
+    },
+    {
+      "id": "3267bf91-1fec-4d66-a7ef-b0935c939922",
+      "canonical_domain": "iristelehealth.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": 0.74082027029352,
+      "routing_flag": "AE",
+      "text_similarity": 0.669946814705029,
+      "numeric_similarity": 0.906191666666667
+    },
+    {
+      "id": "45aa2e35-77a0-404e-89f4-ad8b9050607a",
+      "canonical_domain": "lex-drive.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.679608164743363,
+      "routing_flag": "AE",
+      "text_similarity": 0.569083092490518,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "d259a1df-99be-44eb-80f8-3f9e5baa282e",
+      "canonical_domain": "lncurtis.com",
+      "cluster_label": "Marketplace & Platform Operators",
+      "fit_score": 0.640500123326869,
+      "routing_flag": "AE",
+      "text_similarity": 0.536267845354174,
+      "numeric_similarity": 0.883708771929825
+    },
+    {
+      "id": "c80bc316-bed7-4897-ab1e-69bd01572be7",
+      "canonical_domain": "loftware.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": 0.704627163842283,
+      "routing_flag": "AE",
+      "text_similarity": 0.616610234060405,
+      "numeric_similarity": 0.91
+    },
+    {
+      "id": "31b047db-d0ef-4cc9-86a5-1681240a75c5",
+      "canonical_domain": "msite.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": 0.6787076986036,
+      "routing_flag": "AE",
+      "text_similarity": 0.579582426576572,
+      "numeric_similarity": 0.91
+    },
+    {
+      "id": "eb5e2ea6-431e-4d22-9255-8ac1ca1096cf",
+      "canonical_domain": "neurologica.com",
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "fit_score": 0.710598918419199,
+      "routing_flag": "AE",
+      "text_similarity": 0.646837740598855,
+      "numeric_similarity": 0.859375
+    },
+    {
+      "id": "0b7fd361-9a77-4d60-a458-e0d4636df914",
+      "canonical_domain": "newspringcapital.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.702401364486676,
+      "routing_flag": "AE",
+      "text_similarity": 0.599885282600014,
+      "numeric_similarity": 0.941605555555555
+    },
+    {
+      "id": "755ffd33-b397-4f86-8b69-d080f292d0d6",
+      "canonical_domain": "omnissa.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": 0.719163606617486,
+      "routing_flag": "AE",
+      "text_similarity": 0.667376580882123,
+      "numeric_similarity": 0.84
+    },
+    {
+      "id": "c39a6253-2f6f-48d2-9a12-cbb5d0bccbc7",
+      "canonical_domain": "sage.com",
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "fit_score": 0.797218801491731,
+      "routing_flag": "AE",
+      "text_similarity": 0.748884002131044,
+      "numeric_similarity": 0.91
+    },
+    {
+      "id": "4d0c61a6-5ea1-4ccc-9ecd-25db919cb3a0",
+      "canonical_domain": "sfgroup.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.684404472259944,
+      "routing_flag": "AE",
+      "text_similarity": 0.575934960371349,
+      "numeric_similarity": 0.9375
+    },
+    {
+      "id": "7449b281-3da7-4f51-a36c-a15607036b7d",
+      "canonical_domain": "splitero.com",
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "fit_score": 0.698674759427796,
+      "routing_flag": "AE",
+      "text_similarity": 0.614648152566025,
+      "numeric_similarity": 0.894736842105263
+    },
+    {
+      "id": "2bccb7af-bc78-4f99-8eed-64492aef2f7a",
+      "canonical_domain": "svcleanenergy.org",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.602172545436206,
+      "routing_flag": "AE",
+      "text_similarity": 0.487182207766008,
+      "numeric_similarity": 0.870483333333333
+    },
+    {
+      "id": "829a29f0-36e7-4fe2-ac2a-cdf92287e641",
+      "canonical_domain": "treancorp.com",
+      "cluster_label": "Legacy Services and Operations",
+      "fit_score": 0.678089574817699,
+      "routing_flag": "AE",
+      "text_similarity": 0.566913678310999,
+      "numeric_similarity": 0.9375
+    }
+  ],
+  "centroids": [
+    {
+      "cluster_label": "Complex Enterprise Data Platforms",
+      "lead_count": 25
+    },
+    {
+      "cluster_label": "High-Complexity Enterprise Operators",
+      "lead_count": 19
+    },
+    {
+      "cluster_label": "Integrated Healthcare Operations Platforms",
+      "lead_count": 16
+    },
+    {
+      "cluster_label": "Legacy Services and Operations",
+      "lead_count": 20
+    },
+    {
+      "cluster_label": "Marketplace & Platform Operators",
+      "lead_count": 19
+    }
+  ],
+  "clustering_metadata": null
+}

@@ -44,6 +44,9 @@ export const StandardizedOutputSchema = z.object({
   traffic_velocity: z.string(),
   workload_complexity: z.string(),
   key_integration_flags: z.array(z.string()),
+  nl_summary: z.string().describe(
+    "2-3 sentence natural language description of the company. No numerical scores or metrics."
+  ),
 });
 
 export type StandardizedOutput = z.infer<typeof StandardizedOutputSchema>;

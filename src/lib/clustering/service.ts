@@ -2,7 +2,8 @@ import { generateObject } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { type StandardizedOutput } from "../schemas/lead";
+import { type StandardizedOutput, type CruxOutput } from "../schemas/lead";
+import { extractNumericFeatures, type NumericFeatures } from "../scoring/numeric";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -20,10 +21,10 @@ const ClusteringOutputSchema = z.object({
 });
 
 export async function calculateCentroids(projectId: string): Promise<void> {
-  // 1. Fetch all phase4_done leads with embeddings
+  // 1. Fetch all phase4_done leads with embeddings (include crux_data for numeric features)
   const { data: leads, error } = await supabase
     .from("leads")
-    .select("canonical_domain, standardized_data")
+    .select("canonical_domain, standardized_data, crux_data")
     .eq("project_id", projectId)
     .eq("status", "phase4_done")
     .not("embedding", "is", null);
@@ -37,6 +38,17 @@ export async function calculateCentroids(projectId: string): Promise<void> {
       domain: l.canonical_domain as string,
       data: l.standardized_data as StandardizedOutput,
     }));
+
+  // Build a map for quick lookup during centroid numeric computation
+  const leadsByDomain = new Map(
+    leads.map((l) => [
+      l.canonical_domain as string,
+      {
+        standardized_data: l.standardized_data as StandardizedOutput | null,
+        crux_data: l.crux_data as CruxOutput | null,
+      },
+    ])
+  );
 
   // 3. Ask Claude to identify 2-4 ICP archetypes
   const { object } = await generateObject({
@@ -65,6 +77,48 @@ ${JSON.stringify(profiles, null, 2)}`,
         );
       }
 
+      // Compute average numeric features for leads in this cluster
+      const numericSums: Record<keyof NumericFeatures, number> = {
+        tech_maturity_score: 0,
+        crux_rank: 0,
+        lcp: 0,
+        fid: 0,
+        cls: 0,
+      };
+      const numericCounts: Record<keyof NumericFeatures, number> = {
+        tech_maturity_score: 0,
+        crux_rank: 0,
+        lcp: 0,
+        fid: 0,
+        cls: 0,
+      };
+
+      for (const domain of domains) {
+        const leadData = leadsByDomain.get(domain);
+        if (!leadData) continue;
+        const features = extractNumericFeatures(leadData);
+        for (const key of Object.keys(numericSums) as Array<keyof NumericFeatures>) {
+          if (features[key] !== null) {
+            numericSums[key] += features[key]!;
+            numericCounts[key]++;
+          }
+        }
+      }
+
+      const avgNumericFeatures: NumericFeatures = {
+        tech_maturity_score:
+          numericCounts.tech_maturity_score > 0
+            ? numericSums.tech_maturity_score / numericCounts.tech_maturity_score
+            : null,
+        crux_rank:
+          numericCounts.crux_rank > 0
+            ? numericSums.crux_rank / numericCounts.crux_rank
+            : null,
+        lcp: numericCounts.lcp > 0 ? numericSums.lcp / numericCounts.lcp : null,
+        fid: numericCounts.fid > 0 ? numericSums.fid / numericCounts.fid : null,
+        cls: numericCounts.cls > 0 ? numericSums.cls / numericCounts.cls : null,
+      };
+
       // Insert centroid row (upsert on unique project_id + cluster_label)
       const { error: insertError } = await supabase.from("centroids").upsert(
         {
@@ -73,6 +127,7 @@ ${JSON.stringify(profiles, null, 2)}`,
           notes: cluster.description,
           centroid_vector: centroidVector,
           lead_count: domains.length,
+          numeric_features: avgNumericFeatures,
         },
         { onConflict: "project_id,cluster_label" }
       );

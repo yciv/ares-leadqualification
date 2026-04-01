@@ -94,7 +94,7 @@ export async function POST(
     triggerPromises.push(
       tasks.trigger(config.taskId, {
         projectId,
-        leads: leads.map(config.buildLeadPayload),
+        leads: leads.map(config.buildLeadPayload as (lead: FailedLead) => Record<string, unknown>),
       })
     );
   }

@@ -111,6 +111,10 @@ export async function scoreLeadsAgainstCentroids(
           ? 0.7 * row.similarity + 0.3 * numericSim
           : row.similarity;
 
+      console.log(
+        `[Scoring] ${row.lead_id} score: ${fitScore.toFixed(4)} (completeness: ${completeness.toFixed(2)})`
+      );
+
       const current = best.get(row.lead_id);
       if (!current || fitScore > current.fit_score) {
         best.set(row.lead_id, {

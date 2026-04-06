@@ -6,7 +6,7 @@ Autonomous B2B lead enrichment, clustering, and scoring platform. Ingests raw co
 
 - **Runtime:** Next.js 16 App Router / Node.js + TypeScript
 - **Database:** Supabase (Postgres + pgvector)
-- **Task Orchestration:** Trigger.dev v3
+- **Task Orchestration:** Trigger.dev v4
 - **LLM (standardization):** Claude Haiku 4.5 via Vercel AI SDK
 - **LLM (clustering):** Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`) via Vercel AI SDK
 - **Embeddings:** OpenAI `text-embedding-3-small` via Vercel AI SDK
@@ -96,6 +96,9 @@ Claude Haiku 4.5 normalizes Phase 1 + Phase 2 into a structured profile:
 | traffic_velocity | string | Traffic assessment |
 | workload_complexity | string | Infrastructure complexity |
 | key_integration_flags | string[] | Key platform/tool integrations |
+| nl_summary | string | 2–3 sentence natural language company profile — embedded in Phase 4 |
+
+**CIV-13:** Prompt explicitly instructs Haiku to omit missing fields from `nl_summary` rather than filling with "N/A", "unknown", etc. Post-generation filler detection warns via `console.warn` if any bypass is detected (non-breaking).
 
 ### Phase 4: Vector Embedding
 **Service:** `src/lib/embeddings/service.ts` · **Task:** `src/trigger/phase4.ts` (concurrency: 10)
@@ -126,20 +129,25 @@ Triggered after all leads in a **seed** project reach `phase4_done`.
 
 Scores a test project's leads against a seed project's centroids.
 
-1. Fetches all centroids for the seed project.
+1. Fetches all centroids for the seed project (including `numeric_features`).
 2. For each centroid, calls the `score_leads_against_centroid` RPC — computes `1 - (embedding <=> centroid_vector)` (cosine similarity) for every test lead.
-3. Aggregates in memory: each lead keeps the **highest similarity** score across all centroids.
-4. Applies routing thresholds:
+3. Computes **dual-channel composite score** per lead per centroid:
+   - `fit_score = 0.7 × text_similarity + 0.3 × numeric_similarity` (when numeric data is available)
+   - Falls back to `fit_score = text_similarity` when no numeric overlap exists
+   - `numeric_similarity` compares 5 fields: `tech_maturity_score`, `crux_rank`, `lcp`, `fid`, `cls`
+4. Aggregates in memory: each lead keeps the **highest `fit_score`** across all centroids.
+5. Computes `completeness_score` (0.0–1.0) = fraction of the 5 numeric fields that are non-null. Stored as display-only metadata — does not modify `fit_score`.
+6. Applies routing thresholds:
 
-| Similarity | cluster_label | routing_flag |
+| fit_score | cluster_label | routing_flag |
 |---|---|---|
-| ≥ 0.85 | matched cluster | `AE` |
-| ≥ 0.72 | matched cluster | `SDR` |
-| ≥ 0.60 | `fringe` | `nurture` |
-| < 0.60 | `no_match` | `reject` |
+| ≥ 0.55 | matched cluster | `AE` |
+| ≥ 0.35 | matched cluster | `SDR` |
+| ≥ 0.20 | `fringe` | `nurture` |
+| < 0.20 | `no_match` | `reject` |
 
-5. Bulk updates leads: routing metadata grouped by `(routing_flag, cluster_label)` — one query per group. `fit_score` updated per-lead in parallel via `Promise.all`.
-6. Inserts a record into `scoring_runs` with `seed_project_id`, `test_project_id`, `leads_scored`.
+7. Bulk updates leads: routing metadata grouped by `(routing_flag, cluster_label)` — one query per group. `fit_score`, `text_similarity`, `numeric_similarity`, `completeness_score` updated per-lead in parallel via `Promise.all`.
+8. Inserts a record into `scoring_runs` with `seed_project_id`, `test_project_id`, `leads_scored`.
 
 **API:** `POST /api/projects/[id]/score` — body: `{ seedProjectId: string }`
 
@@ -190,6 +198,9 @@ leads (
   project_id        uuid        REFERENCES projects(id) ON DELETE CASCADE,
   source_tag        text,
   fit_score         float,
+  text_similarity   float,
+  numeric_similarity float,
+  completeness_score float,      -- fraction of 5 numeric fields non-null; display metadata only
   cluster_label     text,
   routing_flag      text,
   scored_at         timestamptz,
@@ -268,6 +279,9 @@ Run in order via the Supabase SQL Editor:
 | 5 | `20260304000000_add_projects_and_clustering.sql` | Add `projects`, `centroids`, `scoring_runs` tables; add project/scoring columns to `leads`; enable Realtime |
 | 6 | `20260304000100_add_centroid_rpc.sql` | `get_centroid_for_domains` function |
 | 7 | `20260304000200_add_scoring_rpc.sql` | `score_leads_against_centroid` function |
+| 8 | `20260313000000_add_numeric_features_to_leads.sql` | Add `numeric_features` jsonb to `centroids`; add `text_similarity`, `numeric_similarity` to `leads` |
+| 9 | `20260313000100_add_scoring_columns.sql` | Add `completeness_score` float to `leads` |
+| 10 | `20260313000200_add_clustering_metadata.sql` | Add clustering metadata columns |
 
 ---
 
@@ -425,3 +439,17 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 - `src/app/projects/[id]/results/page.tsx` — Supabase Realtime subscription on `leads` filtered by `project_id`; merges incoming updates into the store via `updateLead` without replacing all leads or re-running threshold logic
 - `src/lib/store/resultsStore.ts` — added `updateLead(leadId, updates)` action for partial, per-lead store updates
 - `src/components/results/TestResultsView.tsx` — animated "Scoring in progress" banner, visible while any `phase4_done` lead has a null `fit_score`; disappears automatically as Realtime updates arrive
+
+---
+
+### 2026-04-07 — CIV-13: Completeness-Aware Scoring
+
+**nl_summary filler fix (`src/lib/llm/service.ts`):**
+- System prompt updated to instruct Haiku to omit missing fields from `nl_summary` rather than inject "N/A", "unknown", etc. into the semantic embedding channel
+- Added optional `domain` parameter to `standardizeProfile()` for contextual warn logging
+- Post-generation filler detection: regex `/\b(N\/A|unknown|not available|no data|unavailable|unspecified|undetermined)\b/i` — logs `[CIV-13]` warning on match, does not throw
+
+**Completeness as display metadata (`src/lib/scoring/service.ts`):**
+- `completeness_score` (0.0–1.0 = fraction of 5 numeric fields non-null) computed and written to `leads` table on every scoring run
+- Intentionally not applied as a scoring multiplier — leads missing CrUX data are already penalized by falling back to text-only scoring (losing the 30% numeric channel); a second multiplicative penalty would double-punish a data collection artifact
+- Scoring log now emits `[Scoring] <lead_id> score: 0.6800 (completeness: 0.40)` for observability

@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { tasks } from "@trigger.dev/sdk";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 interface LeadInput {
   company_name: string;
@@ -21,6 +16,12 @@ interface CreateProjectBody {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   let body: CreateProjectBody;
   try {
     body = await req.json();
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
   // Action 1: Insert the project and get the generated project_id
   const { data: projectRow, error: projectError } = await supabase
     .from("projects")
-    .insert({ name, description, project_type })
+    .insert({ name, description, project_type, user_id: user.id })
     .select("id")
     .single();
 

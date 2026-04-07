@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { createBrowserClient } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,7 +86,7 @@ function StatusBadge({ status }: { status: string }) {
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const supabase = createBrowserClient();
+  const supabase = createSupabaseBrowserClient();
 
   const [project, setProject] = useState<Project | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);

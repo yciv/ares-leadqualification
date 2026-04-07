@@ -153,6 +153,29 @@ Scores a test project's leads against a seed project's centroids.
 
 ---
 
+## Authentication
+
+Google OAuth via Supabase Auth. Beta-gated via `allowed_emails` table.
+
+**Flow:**
+1. Any unauthenticated request → `src/proxy.ts` redirects to `/login?next=<path>`
+2. User clicks "Sign in with Google" → `supabase.auth.signInWithOAuth` → Google OAuth
+3. Google redirects to `/auth/callback?code=<code>&next=<path>`
+4. Callback exchanges code for session, checks `allowed_emails` — if email not found, signs out and redirects to `/login?error=not_authorized`
+5. On success, redirects to original `next` path with session cookie set
+
+**Beta access:** Add email to `allowed_emails` table in Supabase SQL Editor:
+```sql
+INSERT INTO allowed_emails (email) VALUES ('user@example.com');
+```
+
+**Client setup:**
+- Browser: `createSupabaseBrowserClient()` in `src/lib/supabase/browser.ts` — uses anon key + session cookies via `@supabase/ssr`
+- Server/API routes: `createSupabaseServerClient()` in `src/lib/supabase/server.ts` — reads session from request cookies, enforces RLS
+- Trigger.dev tasks / clustering / scoring: raw `createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)` — bypasses RLS by design
+
+---
+
 ## Web UI
 
 ### New Project (`/projects/new`)
@@ -218,6 +241,7 @@ projects (
   name         text,
   description  text,
   project_type project_type_enum,   -- 'seed' | 'test' | 'live'
+  user_id      uuid REFERENCES auth.users(id),
   created_at   timestamptz DEFAULT now()
 )
 
@@ -282,13 +306,15 @@ Run in order via the Supabase SQL Editor:
 | 8 | `20260313000000_add_numeric_features_to_leads.sql` | Add `numeric_features` jsonb to `centroids`; add `text_similarity`, `numeric_similarity` to `leads` |
 | 9 | `20260313000100_add_scoring_columns.sql` | Add `completeness_score` float to `leads` |
 | 10 | `20260313000200_add_clustering_metadata.sql` | Add clustering metadata columns |
+| 11 | `20260313000300_add_allowed_emails.sql` | Beta email whitelist table + seed user |
+| 12 | `20260313000400_add_user_ownership_and_rls.sql` | Add `user_id` to `projects`; enable RLS on all 5 tables; 13 policies |
 
 ---
 
 ## Environment Variables
 
 ```env
-# Server-side (Trigger.dev tasks, API routes)
+# Server-side (Trigger.dev tasks — bypasses RLS)
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
 LINKUP_API_KEY=<linkup_api_key>
@@ -332,6 +358,7 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 │   ├── run-migrations.ts                      # Verify Supabase connection
 │   └── test-e2e.ts                            # Full pipeline E2E test
 ├── src/
+│   ├── proxy.ts                               # Auth gate — redirects unauthenticated requests to /login
 │   ├── app/
 │   │   ├── api/
 │   │   │   └── projects/
@@ -341,6 +368,10 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 │   │   │           ├── continue/route.ts      # POST /api/projects/:id/continue
 │   │   │           ├── centroids/route.ts     # POST /api/projects/:id/centroids
 │   │   │           └── score/route.ts         # POST /api/projects/:id/score
+│   │   ├── auth/
+│   │   │   └── callback/route.ts              # OAuth code exchange + beta gate
+│   │   ├── login/
+│   │   │   └── page.tsx                       # Google OAuth login page
 │   │   ├── projects/
 │   │   │   ├── new/page.tsx                   # CSV upload + project creation form
 │   │   │   └── [id]/
@@ -354,7 +385,9 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 │   │       └── TestResultsView.tsx            # Threshold sliders + scored table
 │   ├── lib/
 │   │   ├── schemas/lead.ts                    # All Zod schemas + TypeScript types
-│   │   ├── supabase/browser.ts                # Browser-safe Supabase client
+│   │   ├── supabase/
+│   │   │   ├── browser.ts                     # createSupabaseBrowserClient() — anon key + SSR cookies
+│   │   │   └── server.ts                      # createSupabaseServerClient() — session from request cookies
 │   │   ├── store/resultsStore.ts              # Zustand store (leads, thresholds, overrides)
 │   │   ├── clustering/service.ts              # Claude Sonnet clustering + centroid upsert
 │   │   ├── scoring/service.ts                 # Cosine similarity scoring + routing
@@ -369,7 +402,7 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 │       ├── phase4.ts                          # Embedding generation task
 │       ├── centroids.ts                       # Centroid calculation task
 │       └── scoring.ts                         # Lead scoring task
-└── supabase/migrations/                       # 7 SQL migrations
+└── supabase/migrations/                       # 12 SQL migrations
 ```
 
 ---
@@ -439,6 +472,34 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 - `src/app/projects/[id]/results/page.tsx` — Supabase Realtime subscription on `leads` filtered by `project_id`; merges incoming updates into the store via `updateLead` without replacing all leads or re-running threshold logic
 - `src/lib/store/resultsStore.ts` — added `updateLead(leadId, updates)` action for partial, per-lead store updates
 - `src/components/results/TestResultsView.tsx` — animated "Scoring in progress" banner, visible while any `phase4_done` lead has a null `fit_score`; disappears automatically as Realtime updates arrive
+
+---
+
+### 2026-04-08 — CIV-7 + CIV-39: Auth + RLS
+
+**Authentication (Google OAuth):**
+- `@supabase/ssr` installed — replaces raw `@supabase/supabase-js` in browser/server client utilities
+- `src/proxy.ts` — Next.js 16 auth gate (replaces deprecated `middleware.ts`); redirects all unauthenticated requests to `/login?next=<path>`
+- `src/app/login/page.tsx` — Google OAuth sign-in page; dark Ares branding; handles `not_authorized` and `auth_failed` error states
+- `src/app/auth/callback/route.ts` — exchanges OAuth code for session; beta gate checks `allowed_emails` table; signs out unauthorized users
+- `src/lib/supabase/browser.ts` — updated to `createSupabaseBrowserClient()` via `@supabase/ssr`
+- `src/lib/supabase/server.ts` — new `createSupabaseServerClient()` reads session from request cookies
+
+**API route auth guards:**
+- All 5 API routes (`/api/projects` + 4 `[id]` sub-routes) now call `supabase.auth.getUser()` at handler entry — return 401 if not authenticated
+- `POST /api/projects` enforces `user_id: user.id` on project insert — RLS INSERT policy enforces this too
+- Trigger.dev task dispatch (`tasks.trigger()`) unaffected — uses `TRIGGER_SECRET_KEY` independently
+
+**RLS + ownership (2 migrations):**
+- `20260313000300_add_allowed_emails.sql` — `allowed_emails` table, seeded with bootstrap user
+- `20260313000400_add_user_ownership_and_rls.sql` — `user_id uuid` added to `projects`; RLS enabled on `projects`, `leads`, `centroids`, `scoring_runs`, `allowed_emails`; 13 policies total
+- Trigger.dev tasks / clustering / scoring use `SUPABASE_SERVICE_ROLE_KEY` — automatically bypasses RLS, no changes needed
+
+**Backfill required after first sign-in:**
+```sql
+SELECT id FROM auth.users WHERE email = 'yigitcivilo@gmail.com';
+UPDATE projects SET user_id = '<uuid>' WHERE user_id IS NULL;
+```
 
 ---
 

@@ -17,6 +17,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.48",
     "@ai-sdk/openai": "^3.0.36",
+    "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.98.0",
     "@tailwindcss/postcss": "^4.2.1",
     "@trigger.dev/sdk": "^4.4.2",

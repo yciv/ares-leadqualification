@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { createBrowserClient } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -98,7 +98,7 @@ export const useResultsStore = create<ResultsStore>((set, get) => ({
     }));
 
     // Async DB persist — fire and forget (errors are logged, not thrown)
-    const supabase = createBrowserClient();
+    const supabase = createSupabaseBrowserClient();
     supabase
       .from("leads")
       .update({ routing_flag: newFlag })

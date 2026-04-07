@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createBrowserClient } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { useResultsStore, type ResultLead } from "@/lib/store/resultsStore";
 import SeedResultsView from "@/components/results/SeedResultsView";
 import TestResultsView from "@/components/results/TestResultsView";
@@ -28,7 +28,7 @@ export interface Centroid {
 
 export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
-  const supabase = createBrowserClient();
+  const supabase = createSupabaseBrowserClient();
   const setLeads = useResultsStore((s) => s.setLeads);
   const updateLead = useResultsStore((s) => s.updateLead);
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useResultsStore, type ResultLead } from "@/lib/store/resultsStore";
-import { createBrowserClient } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { type Centroid } from "@/app/projects/[id]/results/page";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ export default function SeedResultsView({
   projectId: string;
   centroids: Centroid[];
 }) {
-  const supabase = createBrowserClient();
+  const supabase = createSupabaseBrowserClient();
   const leads = useResultsStore((s) => s.leads);
   const [centroids, setCentroids] = useState(initialCentroids);
   const [selectedLabel, setSelectedLabel] = useState<string | null>(

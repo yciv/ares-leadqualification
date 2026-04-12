@@ -85,7 +85,7 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-gray-500">
+      <div className="flex min-h-screen items-center justify-center text-text-muted">
         Loading…
       </div>
     );
@@ -93,7 +93,7 @@ export default function ResultsPage() {
 
   if (!project) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-red-400">
+      <div className="flex min-h-screen items-center justify-center text-status-danger">
         Project not found.
       </div>
     );
@@ -103,7 +103,7 @@ export default function ResultsPage() {
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{project.name}</h1>
-        <span className="mt-1 inline-block rounded bg-gray-800 px-2 py-0.5 text-xs font-medium capitalize text-gray-300">
+        <span className="mt-1 inline-block rounded bg-bg-elevated px-2 py-0.5 text-xs font-medium capitalize text-text-secondary">
           {project.project_type} · Results
         </span>
       </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useResultsStore, type ResultLead } from "@/lib/store/resultsStore";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { type Centroid } from "@/app/projects/[id]/results/page";
+import { type Centroid } from "@/app/(dashboard)/projects/[id]/results/page";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -80,8 +80,8 @@ function CentroidCard({
       onClick={onSelect}
       className={`cursor-pointer rounded-xl border p-4 transition-colors ${
         selected
-          ? "border-violet-500 bg-violet-950/40"
-          : "border-gray-700 bg-gray-900 hover:border-gray-600"
+          ? "border-accent-gold bg-accent-gold-muted"
+          : "border-border-default bg-bg-surface hover:border-border-hover"
       }`}
     >
       {/* Cluster label with inline edit */}
@@ -97,11 +97,11 @@ function CentroidCard({
               setEditing(false);
             }}
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 rounded border border-violet-500 bg-gray-800 px-2 py-0.5 text-sm text-white focus:outline-none"
+            className="flex-1 rounded border border-border-focus bg-bg-elevated px-2 py-0.5 text-sm text-text-primary focus:outline-none"
           />
         ) : (
           <span
-            className="flex-1 text-sm font-semibold text-white"
+            className="flex-1 text-sm font-semibold text-text-primary"
             onDoubleClick={(e) => {
               e.stopPropagation();
               setEditing(true);
@@ -111,7 +111,7 @@ function CentroidCard({
             {centroid.cluster_label}
           </span>
         )}
-        <span className="shrink-0 rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-400">
+        <span className="shrink-0 rounded bg-bg-elevated px-2 py-0.5 text-xs text-text-secondary">
           {leads.length} leads
         </span>
       </div>
@@ -119,34 +119,34 @@ function CentroidCard({
       {/* Stats */}
       <div className="mb-3 grid grid-cols-3 gap-2 text-xs">
         <div>
-          <p className="text-gray-500">Archetype</p>
-          <p className="mt-0.5 font-medium text-gray-200">{dominantArchetype}</p>
+          <p className="text-text-muted">Archetype</p>
+          <p className="mt-0.5 font-medium text-text-secondary">{dominantArchetype}</p>
         </div>
         <div>
-          <p className="text-gray-500">Industry</p>
-          <p className="mt-0.5 font-medium text-gray-200">{dominantIndustry}</p>
+          <p className="text-text-muted">Industry</p>
+          <p className="mt-0.5 font-medium text-text-secondary">{dominantIndustry}</p>
         </div>
         <div>
-          <p className="text-gray-500">Avg Maturity</p>
-          <p className="mt-0.5 font-medium text-gray-200">{avgMaturity}/5</p>
+          <p className="text-text-muted">Avg Maturity</p>
+          <p className="mt-0.5 font-medium text-text-secondary">{avgMaturity}/5</p>
         </div>
       </div>
 
       {/* Notes */}
       {centroid.notes && (
-        <p className="mb-3 text-xs text-gray-400 line-clamp-2">{centroid.notes}</p>
+        <p className="mb-3 text-xs text-text-secondary line-clamp-2">{centroid.notes}</p>
       )}
 
       {/* Actions */}
       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={handleDownload}
-          className="rounded border border-gray-700 px-2.5 py-1 text-xs text-gray-400 hover:border-gray-500 hover:text-gray-200"
+          className="rounded border border-border-default px-2.5 py-1 text-xs text-text-secondary hover:border-border-hover hover:text-text-primary"
         >
           Download JSON
         </button>
         <button
-          className="rounded border border-violet-700 px-2.5 py-1 text-xs text-violet-400 hover:border-violet-500 hover:text-violet-200"
+          className="rounded border border-accent-gold/30 px-2.5 py-1 text-xs text-accent-gold hover:border-accent-gold hover:text-accent-gold-hover"
           onClick={() => console.log("Score a test batch against cluster", centroid.cluster_label)}
         >
           ↗ Score Test Batch
@@ -194,7 +194,7 @@ export default function SeedResultsView({
 
   if (centroids.length === 0) {
     return (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-text-muted">
         No centroids yet. Run "Calculate Centroids" from the project page first.
       </p>
     );
@@ -204,7 +204,7 @@ export default function SeedResultsView({
     <div className="flex gap-6">
       {/* ── Left: Centroid cards ── */}
       <div className="w-80 shrink-0 space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-text-muted">
           ICP Clusters
         </h2>
         {centroids.map((c) => (
@@ -221,16 +221,16 @@ export default function SeedResultsView({
 
       {/* ── Right: Lead table for selected cluster ── */}
       <div className="min-w-0 flex-1">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-400">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-muted">
           {selectedLabel ? `Leads in "${selectedLabel}"` : "All Leads"}
-          <span className="ml-2 normal-case text-gray-600">
+          <span className="ml-2 normal-case text-text-muted">
             ({filteredLeads.length})
           </span>
         </h2>
-        <div className="rounded-xl border border-gray-800 bg-gray-900 overflow-x-auto">
+        <div className="rounded-xl border border-border-default bg-bg-surface overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-xs text-gray-400">
+              <tr className="border-b border-border-default text-xs text-text-muted">
                 <th className="px-4 py-3 font-medium">Company</th>
                 <th className="px-4 py-3 font-medium">Domain</th>
                 <th className="px-4 py-3 font-medium">Archetype</th>
@@ -241,22 +241,22 @@ export default function SeedResultsView({
             <tbody>
               {filteredLeads.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-text-muted">
                     No leads in this cluster.
                   </td>
                 </tr>
               ) : (
                 filteredLeads.map((lead) => (
-                  <tr key={lead.id} className="border-b border-gray-800/60 hover:bg-gray-800/40">
-                    <td className="px-4 py-2.5 font-medium text-gray-200">{lead.company_name}</td>
-                    <td className="px-4 py-2.5 text-gray-400">{lead.canonical_domain}</td>
-                    <td className="px-4 py-2.5 text-gray-400">
+                  <tr key={lead.id} className="border-b border-border-default/60 hover:bg-bg-elevated/40">
+                    <td className="px-4 py-2.5 font-medium text-text-primary">{lead.company_name}</td>
+                    <td className="px-4 py-2.5 text-text-secondary">{lead.canonical_domain}</td>
+                    <td className="px-4 py-2.5 text-text-secondary">
                       {lead.standardized_data?.stack_archetype ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-center text-gray-300">
+                    <td className="px-4 py-2.5 text-center text-text-secondary">
                       {lead.standardized_data?.tech_maturity_score ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-center text-gray-400">
+                    <td className="px-4 py-2.5 text-center text-text-secondary">
                       {lead.crux_data?.crux_rank != null
                         ? lead.crux_data.crux_rank.toLocaleString()
                         : "—"}

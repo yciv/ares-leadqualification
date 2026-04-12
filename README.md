@@ -12,7 +12,11 @@ Autonomous B2B lead enrichment, clustering, and scoring platform. Ingests raw co
 - **Embeddings:** OpenAI `text-embedding-3-small` via Vercel AI SDK
 - **State Management:** Zustand
 - **Validation:** Zod
-- **Styling:** Tailwind CSS v4
+- **Styling:** Tailwind CSS v4 + shadcn/ui (base-nova style)
+- **UI Components:** shadcn/ui (button, card, table, badge, dialog, dropdown-menu, separator, skeleton, avatar)
+- **Icons:** lucide-react
+- **Font:** Geist (via `geist` npm package + `next/font`)
+- **Toasts:** Sonner (dark theme, bottom-right)
 - **External APIs:** Linkup (company enrichment), Chrome UX Report (web performance)
 
 ---
@@ -177,6 +181,28 @@ INSERT INTO allowed_emails (email) VALUES ('user@example.com');
 ---
 
 ## Web UI
+
+### Dashboard Shell
+All authenticated pages are wrapped in a dashboard shell via the `(dashboard)` route group:
+- **Sidebar** (200px fixed): ARES. logo (gold period), nav items (Projects + Settings placeholder), user email + logout
+- **Topbar** (48px sticky): page title breadcrumb + user avatar
+- **Content area**: fluid width, 24px padding, `--bg-base` background
+- **Login page** (`/login`) lives outside the route group — full-screen, no shell
+
+### Design System
+- **Design guideline:** `.claude/dashboard-design-guideline.md` — authoritative spec for CIV-40 through CIV-44
+- **CSS variables:** Ares design tokens in `:root` (backgrounds, borders, text, gold accent, status colors) + shadcn overrides
+- **Tailwind v4 mapping:** `@theme inline` block in `globals.css` maps tokens to utility classes (`bg-bg-surface`, `text-text-primary`, `border-border-default`, `text-accent-gold`, `text-status-success`, etc.)
+- **Font:** Geist Sans (variable font, loaded via `geist/font/sans` in root layout, CSS variable `--font-sans`)
+- **Components:** shadcn/ui primitives restyled with Ares tokens. Reusable patterns in `src/components/shared/` (EmptyState, PageHeader)
+
+### Projects List (`/projects`)
+- Fetches real project data + lead status counts from Supabase (two queries, no N+1)
+- Card grid (1/2/3 columns responsive) with project name, type badge, lead count, pipeline status badge, relative date
+- Pipeline status derived via `derivePipelineStatus()` from `src/lib/schemas/project.ts`
+- Loading skeletons (3 cards) while fetching
+- EmptyState with FolderKanban icon when no projects exist
+- PageHeader with "New Project" primary action
 
 ### New Project (`/projects/new`)
 - Form for project name, description, type (seed / test / live)
@@ -371,20 +397,36 @@ npx tsx scripts/test-e2e.ts   # Full pipeline E2E test (live APIs)
 │   │   ├── auth/
 │   │   │   └── callback/route.ts              # OAuth code exchange + beta gate
 │   │   ├── login/
-│   │   │   └── page.tsx                       # Google OAuth login page
-│   │   ├── projects/
-│   │   │   ├── new/page.tsx                   # CSV upload + project creation form
-│   │   │   └── [id]/
-│   │   │       ├── page.tsx                   # Project detail + pipeline monitor
-│   │   │       └── results/page.tsx           # Seed/test results router
-│   │   ├── layout.tsx
-│   │   └── page.tsx
+│   │   │   └── page.tsx                       # Google OAuth login page (outside dashboard group)
+│   │   ├── (dashboard)/
+│   │   │   ├── layout.tsx                     # Server layout — session fetch + Shell wrapper
+│   │   │   ├── page.tsx                       # Root redirect → /projects
+│   │   │   └── projects/
+│   │   │       ├── page.tsx                   # Projects list (real data, card grid)
+│   │   │       ├── new/page.tsx               # CSV upload + project creation form
+│   │   │       └── [id]/
+│   │   │           ├── page.tsx               # Project detail + pipeline monitor
+│   │   │           └── results/page.tsx       # Seed/test results router
+│   │   ├── layout.tsx                         # Root layout (Geist font + Sonner toaster)
+│   │   └── globals.css                        # Design tokens + Tailwind v4 @theme
 │   ├── components/
+│   │   ├── layout/
+│   │   │   ├── shell.tsx                      # Sidebar + topbar + content wrapper
+│   │   │   ├── sidebar.tsx                    # Fixed 200px sidebar with nav + user
+│   │   │   └── topbar.tsx                     # Sticky topbar with breadcrumb + avatar
+│   │   ├── projects/
+│   │   │   └── project-card.tsx               # Project card (status badge, type, lead count)
+│   │   ├── shared/
+│   │   │   ├── empty-state.tsx                # Reusable empty state pattern
+│   │   │   └── page-header.tsx                # Title + description + action slot
+│   │   ├── ui/                                # shadcn/ui primitives (auto-generated)
 │   │   └── results/
 │   │       ├── SeedResultsView.tsx            # Cluster cards + lead table
 │   │       └── TestResultsView.tsx            # Threshold sliders + scored table
 │   ├── lib/
-│   │   ├── schemas/lead.ts                    # All Zod schemas + TypeScript types
+│   │   ├── schemas/
+│   │   │   ├── lead.ts                        # Lead Zod schemas + TypeScript types
+│   │   │   └── project.ts                     # Project types, PipelineStatus, derivePipelineStatus()
 │   │   ├── supabase/
 │   │   │   ├── browser.ts                     # createSupabaseBrowserClient() — anon key + SSR cookies
 │   │   │   └── server.ts                      # createSupabaseServerClient() — session from request cookies
@@ -514,3 +556,33 @@ UPDATE projects SET user_id = '<uuid>' WHERE user_id IS NULL;
 - `completeness_score` (0.0–1.0 = fraction of 5 numeric fields non-null) computed and written to `leads` table on every scoring run
 - Intentionally not applied as a scoring multiplier — leads missing CrUX data are already penalized by falling back to text-only scoring (losing the 30% numeric channel); a second multiplicative penalty would double-punish a data collection artifact
 - Scoring log now emits `[Scoring] <lead_id> score: 0.6800 (completeness: 0.40)` for observability
+
+---
+
+### 2026-04-11 — CIV-40: Dashboard Shell Foundation
+
+**Design system + shell:**
+- shadcn/ui initialized (base-nova style, Tailwind v4). Components: button, card, table, badge, dialog, dropdown-menu, separator, skeleton, avatar
+- Ares design tokens in `globals.css` `:root` — backgrounds (4), borders (3), text (4), accent/gold (4), status (5) + Tailwind v4 `@theme inline` mappings
+- Geist font via `geist` npm package, Sonner toasts (dark theme, bottom-right)
+- Shell components: Sidebar (200px fixed, nav, user/logout), Topbar (48px sticky, breadcrumb + avatar), Shell wrapper
+- Reusable patterns: EmptyState, PageHeader in `src/components/shared/`
+
+**Route group migration:**
+- `src/app/(dashboard)/` route group wraps all authenticated pages in Shell
+- Pages moved from `src/app/projects/` → `src/app/(dashboard)/projects/` — URLs unchanged
+- Root `/` redirects to `/projects`; login page remains outside group (no shell)
+
+---
+
+### 2026-04-12 — CIV-41: Projects List + Design Token Migration
+
+**Projects list with real data:**
+- `src/lib/schemas/project.ts` — shared types: Project, ProjectWithStats, PipelineStatus, derivePipelineStatus()
+- `src/components/projects/project-card.tsx` — card component with pipeline status badge, type badge, lead count, relative date
+- `src/app/(dashboard)/projects/page.tsx` — fetches projects + lead statuses (two queries, no N+1), card grid (1/2/3 cols responsive), loading skeletons, empty state
+
+**Design token migration (cosmetic only):**
+- All 5 dashboard pages + 2 result view components restyled with Ares design tokens
+- Replaced `bg-gray-*`, `border-gray-*`, `text-gray-*`, `bg-indigo-*`, `bg-emerald-*` with `bg-bg-*`, `border-border-*`, `text-text-*`, `bg-accent-gold`, `bg-status-*`
+- Zero logic, state, or structure changes — purely cosmetic class swap

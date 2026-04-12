@@ -9,10 +9,10 @@ const ROUTING_FLAGS = ["AE", "SDR", "nurture", "reject"] as const;
 type RoutingFlag = (typeof ROUTING_FLAGS)[number];
 
 const FLAG_STYLES: Record<RoutingFlag, string> = {
-  AE:      "bg-green-700  text-green-100",
-  SDR:     "bg-blue-700   text-blue-100",
-  nurture: "bg-yellow-700 text-yellow-100",
-  reject:  "bg-gray-700   text-gray-300",
+  AE:      "bg-status-success/20 text-status-success",
+  SDR:     "bg-status-info/20    text-status-info",
+  nurture: "bg-status-warning/20 text-status-warning",
+  reject:  "bg-status-neutral/20 text-status-neutral",
 };
 
 // ─── RoutingBadge ─────────────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ function RoutingBadge({
   const ref = useRef<HTMLDivElement>(null);
 
   const current = (flag ?? "reject") as RoutingFlag;
-  const style = FLAG_STYLES[current] ?? "bg-gray-700 text-gray-300";
+  const style = FLAG_STYLES[current] ?? "bg-status-neutral/20 text-status-neutral";
 
   return (
     <div className="relative inline-block" ref={ref}>
@@ -46,7 +46,7 @@ function RoutingBadge({
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-10 mt-1 w-28 rounded-lg border border-gray-700 bg-gray-900 py-1 shadow-lg">
+        <div className="absolute left-0 top-full z-10 mt-1 w-28 rounded-lg border border-border-default bg-bg-surface py-1 shadow-lg">
           {ROUTING_FLAGS.map((f) => (
             <button
               key={f}
@@ -54,8 +54,8 @@ function RoutingBadge({
                 overrideRouting(leadId, f);
                 setOpen(false);
               }}
-              className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs hover:bg-gray-800 ${
-                f === current ? "font-semibold text-white" : "text-gray-400"
+              className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs hover:bg-bg-elevated ${
+                f === current ? "font-semibold text-text-primary" : "text-text-secondary"
               }`}
             >
               <span className={`inline-block h-2 w-2 rounded-full ${FLAG_STYLES[f].split(" ")[0]}`} />
@@ -90,7 +90,7 @@ function ThresholdControl({
 
   return (
     <div className="flex items-center gap-3">
-      <span className="w-16 text-xs text-gray-400">{label}</span>
+      <span className="w-16 text-xs text-text-secondary">{label}</span>
       <input
         type="range"
         min={0}
@@ -101,7 +101,7 @@ function ThresholdControl({
           setDraft(e.target.value);
           setThreshold(tier, parseFloat(e.target.value));
         }}
-        className="w-32 accent-violet-500"
+        className="w-32 accent-accent-gold"
       />
       <input
         type="text"
@@ -112,7 +112,7 @@ function ThresholdControl({
           if (e.key === "Enter") commit(draft);
           if (e.key === "Escape") setDraft(String(value));
         }}
-        className="w-14 rounded border border-gray-700 bg-gray-800 px-2 py-0.5 text-center text-xs text-white focus:border-violet-500 focus:outline-none"
+        className="w-14 rounded border border-border-default bg-bg-elevated px-2 py-0.5 text-center text-xs text-text-primary focus:border-border-focus focus:outline-none"
       />
     </div>
   );
@@ -171,17 +171,17 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
     <div className="space-y-6">
       {/* ── Scoring-in-progress banner ── */}
       {pendingCount > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-violet-800/50 bg-violet-950/30 px-5 py-3">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-violet-400" />
-          <p className="text-sm text-violet-300">
+        <div className="flex items-center gap-3 rounded-xl border border-accent-gold/30 bg-accent-gold-muted px-5 py-3">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-accent-gold" />
+          <p className="text-sm text-accent-gold">
             Scoring in progress — {pendingCount} lead{pendingCount !== 1 ? "s" : ""} pending...
           </p>
         </div>
       )}
 
       {/* ── Threshold controls ── */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-400">
+      <div className="rounded-xl border border-border-default bg-bg-surface p-5">
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-muted">
           Routing Thresholds
         </h2>
         <div className="flex flex-wrap gap-4">
@@ -189,20 +189,20 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
           <ThresholdControl label="SDR"     tier="sdr"     value={thresholds.sdr} />
           <ThresholdControl label="Nurture" tier="nurture" value={thresholds.nurture} />
         </div>
-        <p className="mt-3 text-xs text-gray-600">
+        <p className="mt-3 text-xs text-text-muted">
           Thresholds are applied client-side. Use "Export CSV" to lock in the current assignment.
         </p>
       </div>
 
       {/* ── Actions bar ── */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-text-muted">
           {leads.length} leads · {reviewCount} manually reviewed
         </p>
         <div className="flex gap-2">
           <button
             onClick={() => exportCsv(leads)}
-            className="rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-gray-300 hover:border-gray-500"
+            className="rounded-md border border-border-default px-4 py-2 text-sm font-medium text-text-secondary hover:border-border-hover"
           >
             Export CSV
           </button>
@@ -210,7 +210,7 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
             disabled={!canSyncToAttio}
             title={!canSyncToAttio ? `Review ${10 - reviewCount} more leads to unlock` : undefined}
             onClick={() => console.log("Sync to Attio — project:", projectId)}
-            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md bg-accent-gold px-4 py-2 text-sm font-medium text-text-inverse hover:bg-accent-gold-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
             Sync to Attio
             {!canSyncToAttio && (
@@ -223,10 +223,10 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
       </div>
 
       {/* ── Results table ── */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900 overflow-x-auto">
+      <div className="rounded-xl border border-border-default bg-bg-surface overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-800 text-xs text-gray-400">
+            <tr className="border-b border-border-default text-xs text-text-muted">
               <th className="px-4 py-3 font-medium">Domain</th>
               <th className="px-4 py-3 font-medium">Matched Cluster</th>
               <th className="px-4 py-3 font-medium text-right">Fit %</th>
@@ -239,20 +239,20 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
           <tbody>
             {leads.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-500">
+                <td colSpan={7} className="px-4 py-8 text-center text-sm text-text-muted">
                   No scored leads yet.
                 </td>
               </tr>
             ) : (
               leads.map((lead) => (
-                <tr key={lead.id} className="border-b border-gray-800/60 hover:bg-gray-800/40">
-                  <td className="px-4 py-2.5 font-medium text-gray-200">
+                <tr key={lead.id} className="border-b border-border-default/60 hover:bg-bg-elevated/40">
+                  <td className="px-4 py-2.5 font-medium text-text-primary">
                     {lead.canonical_domain}
                   </td>
-                  <td className="px-4 py-2.5 text-gray-400">
+                  <td className="px-4 py-2.5 text-text-secondary">
                     {lead.cluster_label ?? "—"}
                   </td>
-                  <td className="px-4 py-2.5 text-right font-mono text-gray-300">
+                  <td className="px-4 py-2.5 text-right font-mono text-text-secondary tabular-nums">
                     {lead.fit_score != null
                       ? `${(lead.fit_score * 100).toFixed(1)}%`
                       : "—"}
@@ -264,13 +264,13 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
                       overridden={lead._overridden}
                     />
                   </td>
-                  <td className="px-4 py-2.5 text-gray-400">
+                  <td className="px-4 py-2.5 text-text-secondary">
                     {lead.standardized_data?.stack_archetype ?? "—"}
                   </td>
-                  <td className="px-4 py-2.5 text-center text-gray-300">
+                  <td className="px-4 py-2.5 text-center text-text-secondary">
                     {lead.standardized_data?.tech_maturity_score ?? "—"}
                   </td>
-                  <td className="px-4 py-2.5 text-center text-gray-400">
+                  <td className="px-4 py-2.5 text-center text-text-secondary">
                     {lead.crux_data?.crux_rank != null
                       ? lead.crux_data.crux_rank.toLocaleString()
                       : "—"}

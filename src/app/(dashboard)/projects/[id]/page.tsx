@@ -3,16 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Project {
-  id: string;
-  name: string;
-  description: string | null;
-  project_type: "seed" | "test" | "live";
-  created_at: string;
-}
+import type { Project } from "@/lib/schemas/project";
 
 interface Lead {
   id: string;
@@ -47,12 +38,12 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-gray-600",
-  phase1_done: "bg-blue-500",
+  pending: "bg-status-neutral",
+  phase1_done: "bg-status-info",
   phase2_done: "bg-cyan-500",
   phase3_done: "bg-violet-500",
-  phase4_done: "bg-green-500",
-  error: "bg-red-500",
+  phase4_done: "bg-status-success",
+  error: "bg-status-danger",
 };
 
 function isErrorStatus(status: string) {
@@ -73,11 +64,11 @@ function StatusBadge({ status }: { status: string }) {
   const isError = isErrorStatus(status);
   const label = isError ? status.replace("_error", " ✗") : (STATUS_LABELS[status] ?? status);
   const base =
-    "inline-block rounded px-2 py-0.5 text-xs font-medium text-white";
+    "inline-block rounded px-2 py-0.5 text-xs font-medium text-text-primary";
 
-  if (isError) return <span className={`${base} bg-red-600`}>{label}</span>;
+  if (isError) return <span className={`${base} bg-status-danger`}>{label}</span>;
 
-  const color = STATUS_COLORS[status] ?? "bg-gray-600";
+  const color = STATUS_COLORS[status] ?? "bg-status-neutral";
   return <span className={`${base} ${color}`}>{label}</span>;
 }
 
@@ -250,7 +241,7 @@ export default function ProjectDetailPage() {
   // ── Render ──────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-gray-500">
+      <div className="flex min-h-screen items-center justify-center text-text-muted">
         Loading…
       </div>
     );
@@ -258,7 +249,7 @@ export default function ProjectDetailPage() {
 
   if (!project) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-red-400">
+      <div className="flex min-h-screen items-center justify-center text-status-danger">
         Project not found.
       </div>
     );
@@ -271,10 +262,10 @@ export default function ProjectDetailPage() {
         <div>
           <h1 className="text-2xl font-bold">{project.name}</h1>
           {project.description && (
-            <p className="mt-1 text-sm text-gray-400">{project.description}</p>
+            <p className="mt-1 text-sm text-text-secondary">{project.description}</p>
           )}
-          <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-            <span className="rounded bg-gray-800 px-2 py-0.5 font-medium capitalize text-gray-300">
+          <div className="mt-2 flex items-center gap-3 text-xs text-text-muted">
+            <span className="rounded bg-bg-elevated px-2 py-0.5 font-medium capitalize text-text-secondary">
               {project.project_type}
             </span>
             <span>{formatDate(project.created_at)}</span>
@@ -288,7 +279,7 @@ export default function ProjectDetailPage() {
             <button
               onClick={handleContinue}
               disabled={continuing}
-              className="rounded-lg border border-blue-700 bg-blue-950 px-4 py-2 text-sm font-medium text-blue-300 transition-colors hover:bg-blue-900 disabled:opacity-50"
+              className="rounded-md border border-status-info/30 bg-status-info/10 px-4 py-2 text-sm font-medium text-status-info transition-colors hover:bg-status-info/20 disabled:opacity-50"
             >
               {continuing ? "Continuing…" : `Continue Pipeline (${stuckCount})`}
             </button>
@@ -297,7 +288,7 @@ export default function ProjectDetailPage() {
             <button
               onClick={handleRetry}
               disabled={retrying}
-              className="rounded-lg border border-red-700 bg-red-950 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-900 disabled:opacity-50"
+              className="rounded-md border border-status-danger/30 bg-status-danger/10 px-4 py-2 text-sm font-medium text-status-danger transition-colors hover:bg-status-danger/20 disabled:opacity-50"
             >
               {retrying ? "Retrying…" : `Retry Failed (${errorCount})`}
             </button>
@@ -306,7 +297,7 @@ export default function ProjectDetailPage() {
             <button
               onClick={handleCalculateCentroids}
               disabled={queuingCentroids}
-              className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+              className="rounded-md bg-accent-gold px-4 py-2 text-sm font-medium text-text-inverse hover:bg-accent-gold-hover disabled:opacity-50"
             >
               {queuingCentroids ? "Queueing…" : "Calculate Centroids"}
             </button>
@@ -318,12 +309,12 @@ export default function ProjectDetailPage() {
                 placeholder="Seed Project ID"
                 value={seedProjectId}
                 onChange={(e) => setSeedProjectId(e.target.value)}
-                className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-500"
+                className="rounded-md border border-border-default bg-bg-elevated px-3 py-1.5 text-sm text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none"
               />
               <button
                 onClick={handleScore}
                 disabled={scoring || !seedProjectId.trim()}
-                className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+                className="rounded-md bg-accent-gold px-4 py-1.5 text-sm font-medium text-text-inverse hover:bg-accent-gold-hover disabled:opacity-50"
               >
                 {scoring ? "Scoring…" : "Score Project"}
               </button>
@@ -332,7 +323,7 @@ export default function ProjectDetailPage() {
           {leads.some((l) => l.fit_score !== null) && (
             <a
               href={`/projects/${id}/results`}
-              className="rounded-md bg-zinc-700 px-4 py-1.5 text-sm font-medium text-zinc-100 hover:bg-zinc-600"
+              className="rounded-md bg-bg-elevated border border-border-default px-4 py-1.5 text-sm font-medium text-text-primary hover:border-border-hover"
             >
               View Results →
             </a>
@@ -341,32 +332,32 @@ export default function ProjectDetailPage() {
       </div>
 
       {continueMessage && (
-        <p className="rounded-lg border border-blue-800 bg-blue-950 px-4 py-2 text-sm text-blue-300">
+        <p className="rounded-lg border border-status-info/30 bg-status-info/10 px-4 py-2 text-sm text-status-info">
           {continueMessage}
         </p>
       )}
 
       {retryMessage && (
-        <p className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-gray-300">
+        <p className="rounded-lg border border-border-default bg-bg-surface px-4 py-2 text-sm text-text-secondary">
           {retryMessage}
         </p>
       )}
 
       {centroidsMessage && (
-        <p className="rounded-lg border border-violet-800 bg-violet-950 px-4 py-2 text-sm text-violet-300">
+        <p className="rounded-lg border border-accent-gold/30 bg-accent-gold-muted px-4 py-2 text-sm text-accent-gold">
           {centroidsMessage}
         </p>
       )}
 
       {/* ── Progress ── */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-400">
+      <div className="rounded-xl border border-border-default bg-bg-surface p-5">
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-muted">
           Pipeline Progress
         </h2>
 
         {/* Progress bar */}
         {total > 0 && (
-          <div className="mb-4 flex h-3 w-full overflow-hidden rounded-full bg-gray-800">
+          <div className="mb-4 flex h-3 w-full overflow-hidden rounded-full bg-bg-elevated">
             {[...ORDERED_STATUSES, "error" as const].map((key) => {
               const count = statusCounts[key] ?? 0;
               if (count === 0) return null;
@@ -374,7 +365,7 @@ export default function ProjectDetailPage() {
               return (
                 <div
                   key={key}
-                  className={`${STATUS_COLORS[key] ?? "bg-gray-600"} transition-all`}
+                  className={`${STATUS_COLORS[key] ?? "bg-status-neutral"} transition-all`}
                   style={{ width: `${pct}%` }}
                   title={`${STATUS_LABELS[key] ?? key}: ${count}`}
                 />
@@ -390,12 +381,12 @@ export default function ProjectDetailPage() {
             return (
               <div key={key} className="flex items-center gap-1.5">
                 <span
-                  className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_COLORS[key] ?? "bg-gray-600"}`}
+                  className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_COLORS[key] ?? "bg-status-neutral"}`}
                 />
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-text-muted">
                   {STATUS_LABELS[key] ?? key}
                 </span>
-                <span className="text-xs font-semibold text-white">{count}</span>
+                <span className="text-xs font-semibold text-text-primary">{count}</span>
               </div>
             );
           })}
@@ -403,11 +394,11 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* ── Leads Table ── */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900">
+      <div className="rounded-xl border border-border-default bg-bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-xs text-gray-400">
+              <tr className="border-b border-border-default text-xs text-text-muted">
                 <th className="px-4 py-3 font-medium">Company</th>
                 <th className="px-4 py-3 font-medium">Domain</th>
                 <th className="px-4 py-3 font-medium">Status</th>
@@ -423,7 +414,7 @@ export default function ProjectDetailPage() {
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-4 py-8 text-center text-sm text-gray-500"
+                    className="px-4 py-8 text-center text-sm text-text-muted"
                   >
                     No leads yet.
                   </td>
@@ -432,34 +423,34 @@ export default function ProjectDetailPage() {
                 leads.map((lead) => (
                   <tr
                     key={lead.id}
-                    className="border-b border-gray-800/60 hover:bg-gray-800/40"
+                    className="border-b border-border-default/60 hover:bg-bg-elevated/40"
                   >
-                    <td className="px-4 py-2.5 font-medium text-gray-200">
+                    <td className="px-4 py-2.5 font-medium text-text-primary">
                       {lead.company_name}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-400">
+                    <td className="px-4 py-2.5 text-text-secondary">
                       {lead.canonical_domain}
                     </td>
                     <td className="px-4 py-2.5">
                       <StatusBadge status={lead.status} />
                     </td>
-                    <td className="px-4 py-2.5 text-center text-gray-300">
+                    <td className="px-4 py-2.5 text-center text-text-secondary">
                       {lead.standardized_data?.tech_maturity_score ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-400">
+                    <td className="px-4 py-2.5 text-text-secondary">
                       {lead.standardized_data?.stack_archetype ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-center text-gray-400">
+                    <td className="px-4 py-2.5 text-center text-text-secondary">
                       {lead.crux_data?.crux_rank != null
                         ? lead.crux_data.crux_rank.toLocaleString()
                         : "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-center text-gray-300">
+                    <td className="px-4 py-2.5 text-center text-text-secondary tabular-nums">
                       {lead.fit_score != null
                         ? lead.fit_score.toFixed(2)
                         : "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-400">
+                    <td className="px-4 py-2.5 text-text-secondary">
                       {lead.cluster_label ?? "—"}
                     </td>
                   </tr>

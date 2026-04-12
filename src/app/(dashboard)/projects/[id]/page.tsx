@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { PipelineStepper } from "@/components/projects/pipeline-stepper";
 import type { Project } from "@/lib/schemas/project";
 
 interface Lead {
@@ -20,14 +21,6 @@ interface Lead {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const ORDERED_STATUSES = [
-  "pending",
-  "phase1_done",
-  "phase2_done",
-  "phase3_done",
-  "phase4_done",
-] as const;
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pending",
@@ -116,7 +109,23 @@ export default function ProjectDetailPage() {
   // ── Realtime subscription ───────────────────────────────────────────────────
   useEffect(() => {
     const channel = supabase
-      .channel(`leads:project_id=eq.${id}`)
+      .channel(`leads:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "leads",
+          filter: `project_id=eq.${id}`,
+        },
+        (payload) => {
+          const newLead = payload.new as Lead;
+          setLeads((prev) => {
+            if (prev.some((l) => l.id === newLead.id)) return prev;
+            return [...prev, newLead];
+          });
+        }
+      )
       .on(
         "postgres_changes",
         {
@@ -350,48 +359,13 @@ export default function ProjectDetailPage() {
       )}
 
       {/* ── Progress ── */}
-      <div className="rounded-xl border border-border-default bg-bg-surface p-5">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-muted">
-          Pipeline Progress
-        </h2>
-
-        {/* Progress bar */}
-        {total > 0 && (
-          <div className="mb-4 flex h-3 w-full overflow-hidden rounded-full bg-bg-elevated">
-            {[...ORDERED_STATUSES, "error" as const].map((key) => {
-              const count = statusCounts[key] ?? 0;
-              if (count === 0) return null;
-              const pct = (count / total) * 100;
-              return (
-                <div
-                  key={key}
-                  className={`${STATUS_COLORS[key] ?? "bg-status-neutral"} transition-all`}
-                  style={{ width: `${pct}%` }}
-                  title={`${STATUS_LABELS[key] ?? key}: ${count}`}
-                />
-              );
-            })}
-          </div>
-        )}
-
-        {/* Stats row */}
-        <div className="flex flex-wrap gap-4">
-          {[...ORDERED_STATUSES, "error" as const].map((key) => {
-            const count = statusCounts[key] ?? 0;
-            return (
-              <div key={key} className="flex items-center gap-1.5">
-                <span
-                  className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_COLORS[key] ?? "bg-status-neutral"}`}
-                />
-                <span className="text-xs text-text-muted">
-                  {STATUS_LABELS[key] ?? key}
-                </span>
-                <span className="text-xs font-semibold text-text-primary">{count}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <PipelineStepper
+        statusCounts={statusCounts}
+        totalLeads={total}
+        projectType={project.project_type}
+        clusteringMetadata={project.clustering_metadata}
+        hasScores={leads.some((l) => l.fit_score !== null)}
+      />
 
       {/* ── Leads Table ── */}
       <div className="rounded-xl border border-border-default bg-bg-surface">

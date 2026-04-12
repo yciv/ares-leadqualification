@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Upload } from "lucide-react";
 import Papa from "papaparse";
 
 type ProjectType = "seed" | "test" | "live";
@@ -47,6 +48,7 @@ export default function NewProjectPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -79,6 +81,23 @@ export default function NewProjectPage() {
       },
     });
   }
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(false);
+      const file = e.dataTransfer.files[0];
+      if (!file || !file.name.endsWith(".csv")) return;
+      // Reuse the existing file handler by assigning to the input
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      if (fileRef.current) {
+        fileRef.current.files = dt.files;
+        fileRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    },
+    [] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   const hasLeadErrors = leads.some((l) => l._errors.length > 0);
   const canSubmit =
@@ -220,12 +239,28 @@ export default function NewProjectPage() {
             , no https://).
           </p>
 
+          <div
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 transition-colors ${
+              dragging
+                ? "border-border-focus bg-bg-elevated"
+                : "border-border-default bg-bg-surface hover:bg-bg-elevated"
+            }`}
+          >
+            <Upload className="h-8 w-8 text-text-muted" />
+            <p className="text-sm text-text-secondary">
+              Drag &amp; drop a CSV file or click to browse
+            </p>
+          </div>
           <input
             ref={fileRef}
             type="file"
             accept=".csv"
             onChange={handleFile}
-            className="block w-full text-sm text-text-secondary file:mr-4 file:rounded-md file:border-0 file:bg-accent-gold file:px-4 file:py-2 file:text-sm file:font-medium file:text-text-inverse hover:file:bg-accent-gold-hover"
+            className="hidden"
           />
 
           {fileError && (

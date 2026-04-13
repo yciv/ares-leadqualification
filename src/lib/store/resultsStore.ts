@@ -24,9 +24,9 @@ export interface ResultLead {
 }
 
 export interface Thresholds {
-  ae: number;     // default 0.85
-  sdr: number;    // default 0.72
-  nurture: number; // default 0.60
+  ae: number;     // default 0.55
+  sdr: number;    // default 0.35
+  nurture: number; // default 0.20
 }
 
 // ─── Routing helpers ──────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ interface ResultsStore {
 
 export const useResultsStore = create<ResultsStore>((set, get) => ({
   leads: [],
-  thresholds: { ae: 0.85, sdr: 0.72, nurture: 0.60 },
+  thresholds: { ae: 0.55, sdr: 0.35, nurture: 0.20 },
   reviewCount: 0,
 
   setLeads(leads) {

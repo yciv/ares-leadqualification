@@ -1,29 +1,96 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { useResultsStore, type ResultLead, type Thresholds } from "@/lib/store/resultsStore";
+import { ScoreBadge } from "@/components/leads/score-badge";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const ROUTING_FLAGS = ["AE", "SDR", "nurture", "reject"] as const;
 type RoutingFlag = (typeof ROUTING_FLAGS)[number];
 
-const FLAG_STYLES: Record<RoutingFlag, string> = {
-  AE:      "bg-status-success/20 text-status-success",
-  SDR:     "bg-status-info/20    text-status-info",
-  nurture: "bg-status-warning/20 text-status-warning",
-  reject:  "bg-status-neutral/20 text-status-neutral",
+const FLAG_DOT_STYLES: Record<RoutingFlag, string> = {
+  AE:      "bg-status-success/50",
+  SDR:     "bg-status-warning/50",
+  nurture: "bg-status-info/50",
+  reject:  "bg-status-danger/50",
 };
 
-// ─── RoutingBadge ─────────────────────────────────────────────────────────────
+// ─── Sorting ────────────────────────────────────────────────────────────────��
+
+type SortKey = "company_name" | "cluster_label" | "fit_score" | "routing_flag" | "stack_archetype" | "tech_maturity_score" | "crux_rank";
+type SortDir = "asc" | "desc";
+
+function getSortValue(lead: ResultLead, key: SortKey): string | number | null {
+  switch (key) {
+    case "company_name":        return lead.company_name;
+    case "cluster_label":       return lead.cluster_label;
+    case "fit_score":           return lead.fit_score;
+    case "routing_flag":        return lead.routing_flag;
+    case "stack_archetype":     return lead.standardized_data?.stack_archetype ?? null;
+    case "tech_maturity_score": return lead.standardized_data?.tech_maturity_score ?? null;
+    case "crux_rank":           return lead.crux_data?.crux_rank ?? null;
+  }
+}
+
+function sortLeads(leads: ResultLead[], key: SortKey, dir: SortDir): ResultLead[] {
+  return [...leads].sort((a, b) => {
+    const av = getSortValue(a, key);
+    const bv = getSortValue(b, key);
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    const cmp = typeof av === "string" ? av.localeCompare(bv as string) : (av as number) - (bv as number);
+    return dir === "asc" ? cmp : -cmp;
+  });
+}
+
+// ─── SortHeader ──────────────────────────���───────────────────────────────────
+
+function SortHeader({
+  label,
+  sortKey,
+  activeKey,
+  activeDir,
+  onSort,
+  align = "left",
+}: {
+  label: string;
+  sortKey: SortKey;
+  activeKey: SortKey;
+  activeDir: SortDir;
+  onSort: (key: SortKey) => void;
+  align?: "left" | "center" | "right";
+}) {
+  const active = sortKey === activeKey;
+  const alignCls = align === "right" ? "justify-end" : align === "center" ? "justify-center" : "justify-start";
+  return (
+    <th
+      onClick={() => onSort(sortKey)}
+      className={`cursor-pointer select-none px-3 py-2 font-medium uppercase tracking-wider ${
+        active ? "text-text-primary" : "text-text-muted hover:text-text-secondary"
+      }`}
+    >
+      <span className={`inline-flex items-center gap-1 ${alignCls}`}>
+        {label}
+        {active && (activeDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+      </span>
+    </th>
+  );
+}
+
+// ─── RoutingBadge ─────────────────────────────���──────────────────────────────��
 
 function RoutingBadge({
   leadId,
   flag,
+  fitScore,
   overridden,
 }: {
   leadId: string;
   flag: string | null;
+  fitScore: number | null;
   overridden?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -31,16 +98,15 @@ function RoutingBadge({
   const ref = useRef<HTMLDivElement>(null);
 
   const current = (flag ?? "reject") as RoutingFlag;
-  const style = FLAG_STYLES[current] ?? "bg-status-neutral/20 text-status-neutral";
 
   return (
     <div className="relative inline-block" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className={`flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ${style} ${overridden ? "ring-1 ring-white/30" : ""}`}
+        className={`flex items-center gap-1 ${overridden ? "ring-1 ring-white/30 rounded-md" : ""}`}
         title={overridden ? "Manually overridden" : undefined}
       >
-        {current}
+        <ScoreBadge routingFlag={flag} fitScore={fitScore} />
         {overridden && <span className="text-[10px] opacity-60">✎</span>}
         <span className="text-[10px] opacity-60">▾</span>
       </button>
@@ -58,7 +124,7 @@ function RoutingBadge({
                 f === current ? "font-semibold text-text-primary" : "text-text-secondary"
               }`}
             >
-              <span className={`inline-block h-2 w-2 rounded-full ${FLAG_STYLES[f].split(" ")[0]}`} />
+              <span className={`inline-block h-2 w-2 rounded-full ${FLAG_DOT_STYLES[f]}`} />
               {f}
             </button>
           ))}
@@ -68,7 +134,7 @@ function RoutingBadge({
   );
 }
 
-// ─── ThresholdControl ─────────────────────────────────────────────────────────
+// ─── ThresholdControl ───────────────────────────────────────────────────────��─
 
 function ThresholdControl({
   label,
@@ -85,7 +151,7 @@ function ThresholdControl({
   function commit(raw: string) {
     const num = parseFloat(raw);
     if (!isNaN(num) && num >= 0 && num <= 1) setThreshold(tier, num);
-    else setDraft(String(value)); // revert invalid input
+    else setDraft(String(value));
   }
 
   return (
@@ -101,7 +167,8 @@ function ThresholdControl({
           setDraft(e.target.value);
           setThreshold(tier, parseFloat(e.target.value));
         }}
-        className="w-32 accent-accent-gold"
+        className="w-32"
+        style={{ accentColor: "var(--accent)" }}
       />
       <input
         type="text"
@@ -157,12 +224,29 @@ function exportCsv(leads: ResultLead[]) {
   URL.revokeObjectURL(url);
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// ─── Main ────────────────────────────────────────────────────────��────────────
 
 export default function TestResultsView({ projectId }: { projectId: string }) {
   const leads = useResultsStore((s) => s.leads);
   const thresholds = useResultsStore((s) => s.thresholds);
   const reviewCount = useResultsStore((s) => s.reviewCount);
+
+  const [sortKey, setSortKey] = useState<SortKey>("fit_score");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  const sortedLeads = useMemo(
+    () => sortLeads(leads, sortKey, sortDir),
+    [leads, sortKey, sortDir]
+  );
+
+  function handleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "company_name" || key === "cluster_label" || key === "stack_archetype" ? "asc" : "desc");
+    }
+  }
 
   const canSyncToAttio = reviewCount >= 10;
   const pendingCount = leads.filter((l) => l.fit_score == null && l.status === "phase4_done").length;
@@ -171,17 +255,17 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
     <div className="space-y-6">
       {/* ── Scoring-in-progress banner ── */}
       {pendingCount > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-accent-gold/30 bg-accent-gold-muted px-5 py-3">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-accent-gold" />
-          <p className="text-sm text-accent-gold">
+        <div className="flex items-center gap-3 rounded-lg border border-status-warning/20 bg-status-warning/10 px-5 py-3">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-status-warning" />
+          <p className="text-sm text-status-warning">
             Scoring in progress — {pendingCount} lead{pendingCount !== 1 ? "s" : ""} pending...
           </p>
         </div>
       )}
 
       {/* ── Threshold controls ── */}
-      <div className="rounded-xl border border-border-default bg-bg-surface p-5">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-muted">
+      <div className="rounded-lg border border-border-default bg-bg-surface p-5">
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
           Routing Thresholds
         </h2>
         <div className="flex flex-wrap gap-4">
@@ -190,7 +274,7 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
           <ThresholdControl label="Nurture" tier="nurture" value={thresholds.nurture} />
         </div>
         <p className="mt-3 text-xs text-text-muted">
-          Thresholds are applied client-side. Use "Export CSV" to lock in the current assignment.
+          Thresholds are applied client-side. Use &ldquo;Export CSV&rdquo; to lock in the current assignment.
         </p>
       </div>
 
@@ -201,8 +285,8 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
         </p>
         <div className="flex gap-2">
           <button
-            onClick={() => exportCsv(leads)}
-            className="rounded-md border border-border-default px-4 py-2 text-sm font-medium text-text-secondary hover:border-border-hover"
+            onClick={() => exportCsv(sortedLeads)}
+            className="rounded-md border border-border-default px-4 py-2 text-sm font-medium text-text-secondary hover:border-border-hover hover:text-text-primary"
           >
             Export CSV
           </button>
@@ -223,54 +307,55 @@ export default function TestResultsView({ projectId }: { projectId: string }) {
       </div>
 
       {/* ── Results table ── */}
-      <div className="rounded-xl border border-border-default bg-bg-surface overflow-x-auto">
+      <div className="rounded-lg border border-border-default bg-bg-surface overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-border-default text-xs text-text-muted">
-              <th className="px-4 py-3 font-medium">Domain</th>
-              <th className="px-4 py-3 font-medium">Matched Cluster</th>
-              <th className="px-4 py-3 font-medium text-right">Fit %</th>
-              <th className="px-4 py-3 font-medium">Routing</th>
-              <th className="px-4 py-3 font-medium">Stack Archetype</th>
-              <th className="px-4 py-3 font-medium text-center">Maturity</th>
-              <th className="px-4 py-3 font-medium text-center">CrUX Rank</th>
+          <thead className="sticky top-0 bg-bg-surface">
+            <tr className="border-b border-border-default text-xs">
+              <SortHeader label="Domain" sortKey="company_name" activeKey={sortKey} activeDir={sortDir} onSort={handleSort} />
+              <SortHeader label="Matched Cluster" sortKey="cluster_label" activeKey={sortKey} activeDir={sortDir} onSort={handleSort} />
+              <SortHeader label="Fit %" sortKey="fit_score" activeKey={sortKey} activeDir={sortDir} onSort={handleSort} align="right" />
+              <SortHeader label="Routing" sortKey="routing_flag" activeKey={sortKey} activeDir={sortDir} onSort={handleSort} />
+              <SortHeader label="Stack Archetype" sortKey="stack_archetype" activeKey={sortKey} activeDir={sortDir} onSort={handleSort} />
+              <SortHeader label="Maturity" sortKey="tech_maturity_score" activeKey={sortKey} activeDir={sortDir} onSort={handleSort} align="right" />
+              <SortHeader label="CrUX Rank" sortKey="crux_rank" activeKey={sortKey} activeDir={sortDir} onSort={handleSort} align="right" />
             </tr>
           </thead>
           <tbody>
-            {leads.length === 0 ? (
+            {sortedLeads.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-sm text-text-muted">
+                <td colSpan={7} className="px-3 py-8 text-center text-sm text-text-muted">
                   No scored leads yet.
                 </td>
               </tr>
             ) : (
-              leads.map((lead) => (
-                <tr key={lead.id} className="border-b border-border-default/60 hover:bg-bg-elevated/40">
-                  <td className="px-4 py-2.5 font-medium text-text-primary">
+              sortedLeads.map((lead) => (
+                <tr key={lead.id} className="border-b border-border-default hover:bg-bg-elevated">
+                  <td className="px-3 py-2 font-medium text-text-primary">
                     {lead.canonical_domain}
                   </td>
-                  <td className="px-4 py-2.5 text-text-secondary">
+                  <td className="px-3 py-2 text-text-secondary">
                     {lead.cluster_label ?? "—"}
                   </td>
-                  <td className="px-4 py-2.5 text-right font-mono text-text-secondary tabular-nums">
+                  <td className="px-3 py-2 text-right tabular-nums text-text-secondary">
                     {lead.fit_score != null
                       ? `${(lead.fit_score * 100).toFixed(1)}%`
                       : "—"}
                   </td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-3 py-2">
                     <RoutingBadge
                       leadId={lead.id}
                       flag={lead.routing_flag}
+                      fitScore={lead.fit_score}
                       overridden={lead._overridden}
                     />
                   </td>
-                  <td className="px-4 py-2.5 text-text-secondary">
+                  <td className="px-3 py-2 text-text-secondary">
                     {lead.standardized_data?.stack_archetype ?? "—"}
                   </td>
-                  <td className="px-4 py-2.5 text-center text-text-secondary">
+                  <td className="px-3 py-2 text-right tabular-nums text-text-secondary">
                     {lead.standardized_data?.tech_maturity_score ?? "—"}
                   </td>
-                  <td className="px-4 py-2.5 text-center text-text-secondary">
+                  <td className="px-3 py-2 text-right tabular-nums text-text-secondary">
                     {lead.crux_data?.crux_rank != null
                       ? lead.crux_data.crux_rank.toLocaleString()
                       : "—"}
